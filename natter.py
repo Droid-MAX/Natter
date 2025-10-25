@@ -337,7 +337,7 @@ class StunClient(object):
             )
             return inner_addr, outer_addr
         except (OSError, ValueError, struct.error, socket.error) as ex:
-            raise StunClient.ServerUnavailable(ex)
+            raise StunClient.ServerUnavailable(ex) from None
         finally:
             sock.close()
 
@@ -417,9 +417,9 @@ class KeepAlive(object):
                 buff = self.sock.recv(4096)
                 if not buff:
                     raise OSError("Keep-alive server closed connection")
-        except socket.timeout as ex:
+        except socket.timeout:
             if not buff:
-                raise ex
+                raise
             return
 
     def _keep_alive_udp(self):
@@ -443,9 +443,9 @@ class KeepAlive(object):
                 buff = self.sock.recv(1500)
                 if not buff:
                     raise OSError("Keep-alive server closed connection")
-        except socket.timeout as ex:
+        except socket.timeout:
             if not buff:
-                raise ex
+                raise
             # fix: Keep-alive cause STUN socket timeout on Windows
             if sys.platform == "win32":
                 self.disconnect()
@@ -1705,7 +1705,7 @@ def validate_ip(s, err=True):
         return True
     except (OSError, socket.error):
         if err:
-            raise ValueError("Invalid IP address: %s" % s)
+            raise ValueError("Invalid IP address: %s" % s) from None
         return False
 
 
@@ -2199,8 +2199,12 @@ def natter_main(show_title=True):
                         "Natter is exiting because local IP address "
                         "has changed"
                     )
-                    raise NatterExitException("Local IP address has changed")
-                raise NatterRetryException("Local IP address has changed")
+                    raise NatterExitException(
+                        "Local IP address has changed"
+                    ) from None
+                raise NatterRetryException(
+                    "Local IP address has changed"
+                ) from None
             if udp_mode:
                 Logger.debug("keep-alive: UDP response not received: %s" % ex)
             else:
