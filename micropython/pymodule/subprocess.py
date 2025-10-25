@@ -6,9 +6,9 @@ import sys as _usys
 import _posix
 
 __all__ = [
+    "STDOUT",
     "CalledProcessError",
     "Popen",
-    "STDOUT",
     "SubprocessError",
     "check_output",
 ]

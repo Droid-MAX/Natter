@@ -1,7 +1,7 @@
 # This module provides partial functionality of the CPython "codecs" module for
 # MicroPython.
 
-__all__ = ["CodecInfo", "lookup", "register", "ascii_encode", "ascii_decode"]
+__all__ = ["CodecInfo", "ascii_decode", "ascii_encode", "lookup", "register"]
 
 
 class CodecInfo(object):

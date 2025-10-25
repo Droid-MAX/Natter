@@ -64,23 +64,23 @@ still considered an implementation detail.)
 
 __version__ = "1.1"
 __all__ = [
-    "ArgumentParser",
-    "ArgumentError",
-    "ArgumentTypeError",
-    "FileType",
-    "HelpFormatter",
-    "ArgumentDefaultsHelpFormatter",
-    "RawDescriptionHelpFormatter",
-    "RawTextHelpFormatter",
-    "MetavarTypeHelpFormatter",
-    "Namespace",
-    "Action",
     "ONE_OR_MORE",
     "OPTIONAL",
     "PARSER",
     "REMAINDER",
     "SUPPRESS",
     "ZERO_OR_MORE",
+    "Action",
+    "ArgumentDefaultsHelpFormatter",
+    "ArgumentError",
+    "ArgumentParser",
+    "ArgumentTypeError",
+    "FileType",
+    "HelpFormatter",
+    "MetavarTypeHelpFormatter",
+    "Namespace",
+    "RawDescriptionHelpFormatter",
+    "RawTextHelpFormatter",
 ]
 
 import sys as _usys
