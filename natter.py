@@ -1640,9 +1640,8 @@ def check_docker_network():
         return
     if not os.path.isfile("/sys/class/net/eth0/address"):
         return
-    fo = open("/sys/class/net/eth0/address", "r")
-    macaddr = fo.read().strip()
-    fo.close()
+    with open("/sys/class/net/eth0/address", "r") as fo:
+        macaddr = fo.read().strip()
     hostname = socket.gethostname()
     try:
         ipaddr = socket.gethostbyname(hostname)
@@ -1659,9 +1658,8 @@ def check_docker_network():
 
     if not os.path.isfile("/proc/sys/kernel/osrelease"):
         return
-    fo = open("/proc/sys/kernel/osrelease", "r")
-    uname_r = fo.read().strip()
-    fo.close()
+    with open("/proc/sys/kernel/osrelease", "r") as fo:
+        uname_r = fo.read().strip()
     uname_r_sfx = uname_r.rsplit("-").pop()
     if (
         uname_r_sfx.lower() in ["linuxkit", "wsl2"]

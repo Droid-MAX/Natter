@@ -63,9 +63,8 @@ def check_docker_network():
         return
     if not os.path.isfile("/sys/class/net/eth0/address"):
         return
-    fo = open("/sys/class/net/eth0/address", "r")
-    macaddr = fo.read().strip()
-    fo.close()
+    with open("/sys/class/net/eth0/address", "r") as fo:
+        macaddr = fo.read().strip()
     ipaddr = socket.gethostbyname(socket.getfqdn())
     docker_macaddr = "02:42:" + ":".join(
         ["%02x" % int(x) for x in ipaddr.split(".")]
