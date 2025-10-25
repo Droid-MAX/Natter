@@ -71,7 +71,7 @@ def check_docker_network():
     )
     if macaddr == docker_macaddr:
         sys.stderr.write("Error: Docker's `--net=host` option is required.\n")
-        exit(-1)
+        sys.exit(1)
 
 
 class Status(object):
