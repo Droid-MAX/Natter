@@ -41,6 +41,7 @@ def fix_codecs(codec_list=["utf-8", "idna"]):
             return codecs.CodecInfo(
                 codecs.ascii_encode, codecs.ascii_decode, name="ascii"
             )
+        return None
 
     if missing_codecs:
         codecs.register(search_codec)

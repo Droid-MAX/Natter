@@ -46,6 +46,7 @@ class Pattern(object):
             m = self._p.search(string, pos, endpos)
         if m:
             return Match(m, self, string)
+        return None
 
     def match(self, string, pos=0, endpos=_default):
         if endpos is _default:
@@ -54,6 +55,7 @@ class Pattern(object):
             m = self._p.match(string, pos, endpos)
         if m:
             return Match(m, self, string)
+        return None
 
     def split(self, string, maxsplit=0):
         return self._p.split(string, maxsplit)
