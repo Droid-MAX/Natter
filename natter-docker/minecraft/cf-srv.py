@@ -79,7 +79,7 @@ class CloudFlareDNS:
 
     def _find_zone_id(self, name):
         name = name.lower()
-        data = self._url_req(f"https://api.cloudflare.com/client/v4/zones")
+        data = self._url_req("https://api.cloudflare.com/client/v4/zones")
         for zone_data in data["result"]:
             zone_name = zone_data["name"]
             if name == zone_name or name.endswith("." + zone_name):
