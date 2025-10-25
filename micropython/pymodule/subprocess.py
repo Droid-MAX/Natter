@@ -46,7 +46,7 @@ def _handle_exitstatus(sts):
 
 def _close_fd(fd):
     if fd < 0:
-        return
+        return -1
     try:
         _posix.close(fd)
         fd = -1
