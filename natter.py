@@ -1602,7 +1602,7 @@ def closed_socket_ex(ex):
     return False
 
 
-def fix_codecs(codec_list=["utf-8", "idna"]):
+def fix_codecs(codec_list=("utf-8", "idna")):
     missing_codecs = []
     for codec_name in codec_list:
         try:
