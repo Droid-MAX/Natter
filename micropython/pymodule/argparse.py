@@ -1369,7 +1369,7 @@ class _ActionsContainer(object):
         # it doesn't look like an option string, parse a positional
         # argument
         chars = self.prefix_chars
-        if not args or len(args) == 1 and args[0][0] not in chars:
+        if not args or (len(args) == 1 and args[0][0] not in chars):
             if args and "dest" in kwargs:
                 raise ValueError("dest supplied twice for positional argument")
             kwargs = self._get_positional_kwargs(*args, **kwargs)
@@ -1505,7 +1505,7 @@ class _ActionsContainer(object):
         long_option_strings = []
         for option_string in args:
             # error on strings that don't start with an appropriate prefix
-            if not option_string[0] in self.prefix_chars:
+            if option_string[0] not in self.prefix_chars:
                 args = {
                     "option": option_string,
                     "prefix_chars": self.prefix_chars,
@@ -2021,8 +2021,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                 if positionals_end_index > start_index:
                     start_index = positionals_end_index
                     continue
-                else:
-                    start_index = positionals_end_index
+                start_index = positionals_end_index
 
             # if we consumed all the positionals we could and we're not
             # at the index of an option string, there were extra arguments
@@ -2047,22 +2046,21 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             if action not in seen_actions:
                 if action.required:
                     required_actions.append(_get_action_name(action))
-                else:
-                    # Convert action default now instead of doing it before
-                    # parsing arguments to avoid calling convert functions
-                    # twice (which may fail) if the argument was given, but
-                    # only if it was defined already in the namespace
-                    if (
-                        action.default is not None
-                        and isinstance(action.default, str)
-                        and hasattr(namespace, action.dest)
-                        and action.default is getattr(namespace, action.dest)
-                    ):
-                        setattr(
-                            namespace,
-                            action.dest,
-                            self._get_value(action, action.default),
-                        )
+                # Convert action default now instead of doing it before
+                # parsing arguments to avoid calling convert functions
+                # twice (which may fail) if the argument was given, but
+                # only if it was defined already in the namespace
+                elif (
+                    action.default is not None
+                    and isinstance(action.default, str)
+                    and hasattr(namespace, action.dest)
+                    and action.default is getattr(namespace, action.dest)
+                ):
+                    setattr(
+                        namespace,
+                        action.dest,
+                        self._get_value(action, action.default),
+                    )
 
         if required_actions:
             self.error(
@@ -2170,7 +2168,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             return None
 
         # if it doesn't start with a prefix, it was meant to be positional
-        if not arg_string[0] in self.prefix_chars:
+        if arg_string[0] not in self.prefix_chars:
             return None
 
         # if the option string is present in the parser, return the action

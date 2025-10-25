@@ -78,10 +78,8 @@ class Pattern(object):
             return type(m.string)()
 
         if endpos is not _default:
-            if endpos < pos:
-                endpos = pos
-            if pos < 0:
-                pos = 0
+            endpos = max(endpos, pos)
+            pos = max(pos, 0)
             string = string[pos:endpos]
         elif pos > 0:
             string = string[pos:]

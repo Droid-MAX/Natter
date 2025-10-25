@@ -455,14 +455,12 @@ class StunTest(object):
                 return StunTest.NAT_OPEN_INTERNET
             else:
                 return StunTest.NAT_SYM_UDP_FIREWALL
+        elif ret_test2 is not None:
+            return StunTest.NAT_FULL_CONE
+        elif ret_test3 is not None:
+            return StunTest.NAT_RESTRICTED
         else:
-            if ret_test2 is not None:
-                return StunTest.NAT_FULL_CONE
-            else:
-                if ret_test3 is not None:
-                    return StunTest.NAT_RESTRICTED
-                else:
-                    return StunTest.NAT_PORT_RESTRICTED
+            return StunTest.NAT_PORT_RESTRICTED
 
     def check_tcp_nat_type(self, source_port=0):
         if source_port == 0:
