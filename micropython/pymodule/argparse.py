@@ -135,8 +135,8 @@ class _AttributeHolder(object):
         return []
 
 
-def ngettext(a, b, l):
-    if l == 1:
+def ngettext(a, b, length):
+    if length == 1:
         return a
     return b
 

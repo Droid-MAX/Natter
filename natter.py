@@ -570,7 +570,7 @@ class ForwardIptables(object):
             output = subprocess.check_output(
                 self.iptables_cmd + ["--version"]
             ).decode()
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, subprocess.CalledProcessError):
             return False
         m = re.search(r"iptables v([0-9]+)\.([0-9]+)\.([0-9]+)", output)
         if m:
@@ -587,7 +587,7 @@ class ForwardIptables(object):
             subprocess.check_output(
                 self.iptables_cmd + ["-t", "nat", "--list-rules"]
             )
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, subprocess.CalledProcessError):
             return False
         return True
 
@@ -745,7 +745,7 @@ class ForwardNftables(object):
             output = subprocess.check_output(
                 self.nftables_cmd + ["--version"]
             ).decode()
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, subprocess.CalledProcessError):
             return False
         m = re.search(r"nftables v([0-9]+)\.([0-9]+)\.([0-9]+)", output)
         if m:
@@ -909,7 +909,7 @@ class ForwardGost(object):
             output = subprocess.check_output(
                 ["gost", "-V"], stderr=subprocess.STDOUT
             ).decode()
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, subprocess.CalledProcessError):
             return False
         m = re.search(r"gost v?([0-9]+)\.([0-9]+)", output)
         if m:
@@ -972,7 +972,7 @@ class ForwardSocat(object):
             output = subprocess.check_output(
                 ["socat", "-V"], stderr=subprocess.STDOUT
             ).decode()
-        except (OSError, subprocess.CalledProcessError) as e:
+        except (OSError, subprocess.CalledProcessError):
             return False
         m = re.search(r"socat version ([0-9]+)\.([0-9]+)\.([0-9]+)", output)
         if m:
@@ -1328,7 +1328,7 @@ class UPnPDevice(object):
     def __repr__(self):
         return "<UPnPDevice ipaddr=%s>" % (repr(self.ipaddr),)
 
-    def _load_services(self):
+    def load_services(self):
         if self.services:
             return
         services_d = {}  # service_id => UPnPService()
@@ -1510,7 +1510,7 @@ class UPnPClient(object):
                 bind_ip=self._bind_ip,
                 interface=self._bind_interface,
             )
-            d._load_services()
+            d.load_services()
             devs.append(d)
 
         return devs
@@ -1717,10 +1717,10 @@ def validate_port(s, err=True):
 
 
 def validate_addr_str(s, err=True):
-    l = str(s).split(":", 1)
-    if len(l) == 1:
+    a = str(s).split(":", 1)
+    if len(a) == 1:
         return True
-    return validate_port(l[1], err)
+    return validate_port(a[1], err)
 
 
 def validate_positive(s, err=True):
@@ -1928,17 +1928,17 @@ def natter_main(show_title=True):
 
     stun_srv_list = []
     for item in stun_list:
-        l = item.split(":", 2) + ["3478"]
+        a = item.split(":", 2) + ["3478"]
         stun_srv_list.append(
-            (l[0], int(l[1])),
+            (a[0], int(a[1])),
         )
 
     if udp_mode:
-        l = keepalive_srv.split(":", 2) + ["53"]
-        keepalive_host, keepalive_port = l[0], int(l[1])
+        a = keepalive_srv.split(":", 2) + ["53"]
+        keepalive_host, keepalive_port = a[0], int(a[1])
     else:
-        l = keepalive_srv.split(":", 2) + ["80"]
-        keepalive_host, keepalive_port = l[0], int(l[1])
+        a = keepalive_srv.split(":", 2) + ["80"]
+        keepalive_host, keepalive_port = a[0], int(a[1])
 
     # forward method defaults
     if not method:

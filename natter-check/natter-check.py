@@ -46,8 +46,8 @@ def fix_codecs(codec_list=["utf-8", "idna"]):
         codecs.register(search_codec)
 
 
-def new_socket_reuse(family, type):
-    sock = socket.socket(family, type)
+def new_socket_reuse(family, sock_type):
+    sock = socket.socket(family, sock_type)
     if hasattr(socket, "SO_REUSEADDR"):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     if hasattr(socket, "SO_REUSEPORT"):
@@ -162,7 +162,7 @@ class StunTest(object):
         try:
             host, alias, ip_addresses = socket.gethostbyname_ex(hostname)
             return ip_addresses
-        except (socket.error, OSError) as e:
+        except (socket.error, OSError):
             return []
 
     def _random_tran_id(self, use_magic_cookie=False):
@@ -225,7 +225,7 @@ class StunTest(object):
                 ret = None
             sock.shutdown(socket.SHUT_RDWR)
             sock.close()
-        except Exception as e:
+        except Exception:
             sock.close()
             ret = None
         return ret
@@ -402,7 +402,7 @@ class StunTest(object):
             ValueError,
             TypeError,
             socket.error,
-        ) as ex:
+        ):
             return 0
         finally:
             ka_sock.close()
@@ -515,11 +515,11 @@ class Check(object):
     def _check_tcp_nat(self):
         if self.stun_test is None:
             self.stun_test = StunTest()
-        type = self.stun_test.check_tcp_nat_type()
-        info = "NAT Type: %s" % type
-        if type in [StunTest.NAT_OPEN_INTERNET, StunTest.NAT_FULL_CONE]:
+        nat_type = self.stun_test.check_tcp_nat_type()
+        info = "NAT Type: %s" % nat_type
+        if nat_type in [StunTest.NAT_OPEN_INTERNET, StunTest.NAT_FULL_CONE]:
             status = Status.OK
-        elif type == StunTest.NAT_UNKNOWN:
+        elif nat_type == StunTest.NAT_UNKNOWN:
             status = Status.NA
         else:
             status = Status.FAIL
@@ -528,11 +528,11 @@ class Check(object):
     def _check_udp_nat(self):
         if self.stun_test is None:
             self.stun_test = StunTest()
-        type = self.stun_test.check_udp_nat_type()
+        nat_type = self.stun_test.check_udp_nat_type()
         info = "NAT Type: %s" % type
-        if type in [StunTest.NAT_OPEN_INTERNET, StunTest.NAT_FULL_CONE]:
+        if nat_type in [StunTest.NAT_OPEN_INTERNET, StunTest.NAT_FULL_CONE]:
             status = Status.OK
-        elif type == StunTest.NAT_UNKNOWN:
+        elif nat_type == StunTest.NAT_UNKNOWN:
             status = Status.NA
         else:
             status = Status.FAIL
