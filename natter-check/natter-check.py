@@ -28,16 +28,20 @@ import codecs
 __version__ = "2.3.0-dev"
 
 
-def fix_codecs(codec_list = ["utf-8", "idna"]):
+def fix_codecs(codec_list=["utf-8", "idna"]):
     missing_codecs = []
     for codec_name in codec_list:
         try:
             codecs.lookup(codec_name)
         except LookupError:
             missing_codecs.append(codec_name.lower())
+
     def search_codec(name):
         if name.lower() in missing_codecs:
-            return codecs.CodecInfo(codecs.ascii_encode, codecs.ascii_decode, name="ascii")
+            return codecs.CodecInfo(
+                codecs.ascii_encode, codecs.ascii_decode, name="ascii"
+            )
+
     if missing_codecs:
         codecs.register(search_codec)
 
@@ -62,24 +66,27 @@ def check_docker_network():
     macaddr = fo.read().strip()
     fo.close()
     ipaddr = socket.gethostbyname(socket.getfqdn())
-    docker_macaddr = "02:42:" + ":".join(["%02x" % int(x) for x in ipaddr.split(".")])
+    docker_macaddr = "02:42:" + ":".join(
+        ["%02x" % int(x) for x in ipaddr.split(".")]
+    )
     if macaddr == docker_macaddr:
         sys.stderr.write("Error: Docker's `--net=host` option is required.\n")
         exit(-1)
 
 
 class Status(object):
-    NA      = 0
-    OK      = 1
-    COMPAT  = 2
-    FAIL    = 3
+    NA = 0
+    OK = 1
+    COMPAT = 2
+    FAIL = 3
+
     @staticmethod
     def rep(status):
         return {
-            Status.NA:      "[   NA   ]",
-            Status.OK:      "[   OK   ]",
-            Status.COMPAT:  "[ COMPAT ]",
-            Status.FAIL:    "[  FAIL  ]"
+            Status.NA: "[   NA   ]",
+            Status.OK: "[   OK   ]",
+            Status.COMPAT: "[ COMPAT ]",
+            Status.FAIL: "[  FAIL  ]",
         }[status]
 
 
@@ -96,14 +103,15 @@ class StunTest(object):
         "global.turn.twilio.com",
         "turn.cloudflare.com",
         "stun.voip.blackberry.com",
-        "stun.radiojar.com"
+        "stun.radiojar.com",
     ]
-    # Servers in this list must be compatible with rfc3489, with "change IP" and "change port" functions available
+    # Servers in this list must be compatible with rfc3489, with "change IP"
+    # and "change port" functions available
     stun_server_udp = [
         "stun.miwifi.com",
         "stun.chat.bilibili.com",
         "stun.hitv.com",
-        "stun.cdnbye.com"
+        "stun.cdnbye.com",
     ]
     # Port test server. ref: https://github.com/transmission/portcheck
     port_test_server = "portcheck.transmissionbt.com"
@@ -111,27 +119,27 @@ class StunTest(object):
     # HTTP keep-alive server
     keep_alive_server = "www.baidu.com"
 
-    MTU         = 1500
-    STUN_PORT   = 3478
-    MAGIC_COOKIE    = 0x2112a442
-    BIND_REQUEST    = 0x0001
-    BIND_RESPONSE   = 0x0101
-    FAMILY_IPV4     = 0x01
-    FAMILY_IPV6     = 0x02
-    CHANGE_PORT     = 0x0002
-    CHANGE_IP       = 0x0004
-    ATTRIB_MAPPED_ADDRESS      = 0x0001
-    ATTRIB_CHANGE_REQUEST      = 0x0003
-    ATTRIB_XOR_MAPPED_ADDRESS  = 0x0020
-    NAT_UNKNOWN          = -1
-    NAT_OPEN_INTERNET    = 0
-    NAT_FULL_CONE        = 1
-    NAT_RESTRICTED       = 2
-    NAT_PORT_RESTRICTED  = 3
-    NAT_SYMMETRIC        = 4
+    MTU = 1500
+    STUN_PORT = 3478
+    MAGIC_COOKIE = 0x2112A442
+    BIND_REQUEST = 0x0001
+    BIND_RESPONSE = 0x0101
+    FAMILY_IPV4 = 0x01
+    FAMILY_IPV6 = 0x02
+    CHANGE_PORT = 0x0002
+    CHANGE_IP = 0x0004
+    ATTRIB_MAPPED_ADDRESS = 0x0001
+    ATTRIB_CHANGE_REQUEST = 0x0003
+    ATTRIB_XOR_MAPPED_ADDRESS = 0x0020
+    NAT_UNKNOWN = -1
+    NAT_OPEN_INTERNET = 0
+    NAT_FULL_CONE = 1
+    NAT_RESTRICTED = 2
+    NAT_PORT_RESTRICTED = 3
+    NAT_SYMMETRIC = 4
     NAT_SYM_UDP_FIREWALL = 5
 
-    def __init__(self, source_ip = "0.0.0.0"):
+    def __init__(self, source_ip="0.0.0.0"):
         self.source_ip = source_ip
         self.stun_ip_tcp = []
         self.stun_ip_udp = []
@@ -157,7 +165,7 @@ class StunTest(object):
         except (socket.error, OSError) as e:
             return []
 
-    def _random_tran_id(self, use_magic_cookie = False):
+    def _random_tran_id(self, use_magic_cookie=False):
         if use_magic_cookie:
             # Compatible with rfc3489, rfc5389 and rfc8489
             return struct.pack("!L", self.MAGIC_COOKIE) + os.urandom(12)
@@ -165,20 +173,20 @@ class StunTest(object):
             # Compatible with rfc3489
             return os.urandom(16)
 
-    def _pack_stun_message(self, msg_type, tran_id, payload = b""):
+    def _pack_stun_message(self, msg_type, tran_id, payload=b""):
         return struct.pack("!HH", msg_type, len(payload)) + tran_id + payload
 
     def _unpack_stun_message(self, data):
         msg_type, msg_length = struct.unpack("!HH", data[:4])
         tran_id = data[4:20]
-        payload = data[20:20 + msg_length]
+        payload = data[20 : 20 + msg_length]
         return msg_type, tran_id, payload
 
     def _extract_mapped_addr(self, payload):
         while payload:
             attrib_type, attrib_length = struct.unpack("!HH", payload[:4])
-            attrib_value = payload[4:4 + attrib_length]
-            payload = payload[4 + attrib_length:]
+            attrib_value = payload[4 : 4 + attrib_length]
+            payload = payload[4 + attrib_length :]
             if attrib_type == self.ATTRIB_MAPPED_ADDRESS:
                 _, family, port = struct.unpack("!BBH", attrib_value[:4])
                 if family == self.FAMILY_IPV4:
@@ -188,15 +196,17 @@ class StunTest(object):
                 # rfc5389 and rfc8489
                 _, family, xor_port = struct.unpack("!BBH", attrib_value[:4])
                 if family == self.FAMILY_IPV4:
-                    xor_iip, = struct.unpack("!L", attrib_value[4:8])
-                    ip = socket.inet_ntoa(struct.pack("!L", self.MAGIC_COOKIE ^ xor_iip))
+                    (xor_iip,) = struct.unpack("!L", attrib_value[4:8])
+                    ip = socket.inet_ntoa(
+                        struct.pack("!L", self.MAGIC_COOKIE ^ xor_iip)
+                    )
                     port = (self.MAGIC_COOKIE >> 16) ^ xor_port
                     return ip, port
         return None
 
-    def tcp_test(self, stun_host, source_port, timeout = 3):
+    def tcp_test(self, stun_host, source_port, timeout=3):
         # rfc5389 and rfc8489 only
-        tran_id = self._random_tran_id(use_magic_cookie = True)
+        tran_id = self._random_tran_id(use_magic_cookie=True)
         sock = new_socket_reuse(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         sock.settimeout(timeout)
@@ -208,7 +218,7 @@ class StunTest(object):
             buf = sock.recv(self.MTU)
             msg_type, msg_id, payload = self._unpack_stun_message(buf)
             if tran_id == msg_id and msg_type == self.BIND_RESPONSE:
-                source_addr  = sock.getsockname()
+                source_addr = sock.getsockname()
                 mapped_addr = self._extract_mapped_addr(payload)
                 ret = source_addr, mapped_addr
             else:
@@ -220,7 +230,15 @@ class StunTest(object):
             ret = None
         return ret
 
-    def udp_test(self, stun_host, source_port, change_ip = False, change_port = False, timeout = 3, repeat = 3):
+    def udp_test(
+        self,
+        stun_host,
+        source_port,
+        change_ip=False,
+        change_port=False,
+        timeout=3,
+        repeat=3,
+    ):
         time_start = time.time()
         tran_id = self._random_tran_id()
         sock = new_socket_reuse(socket.AF_INET, socket.SOCK_DGRAM)
@@ -233,8 +251,12 @@ class StunTest(object):
             if change_port:
                 flags |= self.CHANGE_PORT
             if flags:
-                payload = struct.pack("!HHL", self.ATTRIB_CHANGE_REQUEST, 0x4, flags)
-                data = self._pack_stun_message(self.BIND_REQUEST, tran_id, payload)
+                payload = struct.pack(
+                    "!HHL", self.ATTRIB_CHANGE_REQUEST, 0x4, flags
+                )
+                data = self._pack_stun_message(
+                    self.BIND_REQUEST, tran_id, payload
+                )
             else:
                 data = self._pack_stun_message(self.BIND_REQUEST, tran_id)
             # Send packets repeatedly to avoid packet loss.
@@ -253,17 +275,17 @@ class StunTest(object):
                 msg_type, msg_id, payload = self._unpack_stun_message(buf)
                 if tran_id != msg_id or msg_type != self.BIND_RESPONSE:
                     continue
-                source_addr  = sock.getsockname()
-                mapped_addr  = self._extract_mapped_addr(payload)
-                ip_changed   = (recv_host != stun_host)
-                port_changed = (recv_port != self.STUN_PORT)
+                source_addr = sock.getsockname()
+                mapped_addr = self._extract_mapped_addr(payload)
+                ip_changed = recv_host != stun_host
+                port_changed = recv_port != self.STUN_PORT
                 return source_addr, mapped_addr, ip_changed, port_changed
         except Exception:
             return None
         finally:
             sock.close()
 
-    def get_tcp_mapping(self, source_port = 0):
+    def get_tcp_mapping(self, source_port=0):
         server_ip = first = self.stun_ip_tcp[0]
         while True:
             ret = self.tcp_test(server_ip, source_port)
@@ -277,7 +299,7 @@ class StunTest(object):
                 source_addr, mapped_addr = ret
                 return source_addr, mapped_addr
 
-    def get_udp_mapping(self, source_port = 0):
+    def get_udp_mapping(self, source_port=0):
         server_ip = first = self.stun_ip_udp[0]
         while True:
             ret = self.udp_test(server_ip, source_port)
@@ -291,8 +313,9 @@ class StunTest(object):
                 source_addr, mapped_addr, ip_changed, port_changed = ret
                 return source_addr, mapped_addr
 
-    def _check_tcp_cone(self, source_port = 0):
-        # Detect NAT behavior for TCP. Requires at least three STUN servers for accuracy.
+    def _check_tcp_cone(self, source_port=0):
+        # Detect NAT behavior for TCP. Requires at least three STUN servers for
+        # accuracy.
         if source_port == 0:
             source_port = self._get_free_port()
         mapped_addr_first = None
@@ -303,13 +326,16 @@ class StunTest(object):
             ret = self.tcp_test(server_ip, source_port)
             if ret is not None:
                 source_addr, mapped_addr = ret
-                if mapped_addr_first is not None and mapped_addr != mapped_addr_first:
+                if (
+                    mapped_addr_first is not None
+                    and mapped_addr != mapped_addr_first
+                ):
                     return -1
                 mapped_addr_first = ret[1]
                 count += 1
         return 0
 
-    def _check_tcp_fullcone(self, source_port = 0):
+    def _check_tcp_fullcone(self, source_port=0):
         if source_port == 0:
             source_port = self._get_free_port()
         # Open port
@@ -325,9 +351,14 @@ class StunTest(object):
         try:
             ka_sock.bind((self.source_ip, source_port))
             ka_sock.connect((self.keep_alive_server, 80))
-            ka_sock.sendall((
-                "GET /~ HTTP/1.1\r\nHost: %s\r\nConnection: keep-alive\r\n\r\n" % self.keep_alive_server
-            ).encode())
+            ka_sock.sendall(
+                (
+                    "GET /~ HTTP/1.1\r\n"
+                    "Host: %s\r\n"
+                    "Connection: keep-alive\r\n"
+                    "\r\n" % self.keep_alive_server
+                ).encode()
+            )
             source_addr, mapped_addr = self.get_tcp_mapping(source_port)
             public_port = mapped_addr[1]
         except (OSError, socket.error):
@@ -343,14 +374,16 @@ class StunTest(object):
         try:
             sock.bind((self.source_ip, 0))
             sock.connect((StunTest.port_test_server, 80))
-            sock.sendall((
-                "GET /%d HTTP/1.0\r\n"
-                "Host: %s\r\n"
-                "User-Agent: curl/8.0.0 (Natter)\r\n"
-                "Accept: */*\r\n"
-                "Connection: close\r\n"
-                "\r\n" % (public_port, StunTest.port_test_server)
-            ).encode())
+            sock.sendall(
+                (
+                    "GET /%d HTTP/1.0\r\n"
+                    "Host: %s\r\n"
+                    "User-Agent: curl/8.0.0 (Natter)\r\n"
+                    "Accept: */*\r\n"
+                    "Connection: close\r\n"
+                    "\r\n" % (public_port, StunTest.port_test_server)
+                ).encode()
+            )
             response = b""
             while True:
                 buff = sock.recv(4096)
@@ -363,14 +396,20 @@ class StunTest(object):
             elif content.strip() == b"0":
                 return -1
             raise ValueError("Unexpected response: %s" % response)
-        except (OSError, LookupError, ValueError, TypeError, socket.error) as ex:
+        except (
+            OSError,
+            LookupError,
+            ValueError,
+            TypeError,
+            socket.error,
+        ) as ex:
             return 0
         finally:
             ka_sock.close()
             srv_sock.close()
             sock.close()
 
-    def check_udp_nat_type(self, source_port = 0):
+    def check_udp_nat_type(self, source_port=0):
         # Like classic STUN (rfc3489). Detect NAT behavior for UDP.
         # Modified from rfc3489. Requires at least two STUN servers.
         ret_test1_1 = None
@@ -381,7 +420,9 @@ class StunTest(object):
             source_port = self._get_free_port(udp=True)
 
         for server_ip in self.stun_ip_udp:
-            ret = self.udp_test(server_ip, source_port, change_ip=False, change_port=False)
+            ret = self.udp_test(
+                server_ip, source_port, change_ip=False, change_port=False
+            )
             if ret is None:
                 # Try another STUN server
                 continue
@@ -389,14 +430,18 @@ class StunTest(object):
                 ret_test1_1 = ret
                 continue
             ret_test1_2 = ret
-            ret = self.udp_test(server_ip, source_port, change_ip=True, change_port=True)
+            ret = self.udp_test(
+                server_ip, source_port, change_ip=True, change_port=True
+            )
             if ret is not None:
                 source_addr, mapped_addr, ip_changed, port_changed = ret
                 if not ip_changed or not port_changed:
                     # Try another STUN server
                     continue
             ret_test2 = ret
-            ret_test3 = self.udp_test(server_ip, source_port, change_ip=False, change_port=True)
+            ret_test3 = self.udp_test(
+                server_ip, source_port, change_ip=False, change_port=True
+            )
             break
         else:
             return StunTest.NAT_UNKNOWN
@@ -419,7 +464,7 @@ class StunTest(object):
                 else:
                     return StunTest.NAT_PORT_RESTRICTED
 
-    def check_tcp_nat_type(self, source_port = 0):
+    def check_tcp_nat_type(self, source_port=0):
         if source_port == 0:
             source_port = self._get_free_port()
         ret = self._check_tcp_fullcone(source_port)

@@ -2,6 +2,7 @@
 # MicroPython.
 
 import sys as _sys
+
 _path = _sys.path
 _sys.path = ()
 try:
@@ -10,9 +11,7 @@ finally:
     _sys.path = _path
     del _path
 
-__all__ = [
-    'calcsize', 'pack', 'pack_into', 'unpack', 'unpack_from'
-]
+__all__ = ["calcsize", "pack", "pack_into", "unpack", "unpack_from"]
 
 
 class _StructError(Exception):

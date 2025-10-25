@@ -39,8 +39,8 @@ __version__ = "2.3.0-dev"
 
 class Logger(object):
     DEBUG = 0
-    INFO  = 1
-    WARN  = 2
+    INFO = 1
+    WARN = 2
     ERROR = 3
     rep = {DEBUG: "D", INFO: "I", WARN: "W", ERROR: "E"}
     level = INFO
@@ -63,37 +63,39 @@ class Logger(object):
     @staticmethod
     def debug(text=""):
         if Logger.level <= Logger.DEBUG:
-            sys.stderr.write((Logger.GREY + "%s [%s] %s\n" + Logger.RESET) % (
-                Logger.get_timestr(), Logger.rep[Logger.DEBUG], text
-            ))
+            sys.stderr.write(
+                (Logger.GREY + "%s [%s] %s\n" + Logger.RESET)
+                % (Logger.get_timestr(), Logger.rep[Logger.DEBUG], text)
+            )
 
     @staticmethod
     def info(text=""):
         if Logger.level <= Logger.INFO:
-            sys.stderr.write(("%s [%s] %s\n") % (
-                Logger.get_timestr(), Logger.rep[Logger.INFO], text
-            ))
+            sys.stderr.write(
+                ("%s [%s] %s\n")
+                % (Logger.get_timestr(), Logger.rep[Logger.INFO], text)
+            )
 
     @staticmethod
     def warning(text=""):
         if Logger.level <= Logger.WARN:
-            sys.stderr.write((Logger.YELLOW_BOLD + "%s [%s] %s\n" +
-                              Logger.RESET) % (
-                Logger.get_timestr(), Logger.rep[Logger.WARN], text
-            ))
+            sys.stderr.write(
+                (Logger.YELLOW_BOLD + "%s [%s] %s\n" + Logger.RESET)
+                % (Logger.get_timestr(), Logger.rep[Logger.WARN], text)
+            )
 
     @staticmethod
     def error(text=""):
         if Logger.level <= Logger.ERROR:
-            sys.stderr.write((Logger.RED_BOLD + "%s [%s] %s\n" +
-                              Logger.RESET) % (
-                Logger.get_timestr(), Logger.rep[Logger.ERROR], text
-            ))
+            sys.stderr.write(
+                (Logger.RED_BOLD + "%s [%s] %s\n" + Logger.RESET)
+                % (Logger.get_timestr(), Logger.rep[Logger.ERROR], text)
+            )
 
 
 class NatterExit(object):
-    atexit.register(lambda : NatterExit._atexit[0]())
-    _atexit = [lambda : None]
+    atexit.register(lambda: NatterExit._atexit[0]())
+    _atexit = [lambda: None]
 
     @staticmethod
     def set_atexit(func):
@@ -107,9 +109,9 @@ class PortTest(object):
         try:
             socket_set_opt(
                 sock,
-                bind_addr   = (source_ip, 0) if source_ip else None,
-                interface   = interface,
-                timeout     = 1
+                bind_addr=(source_ip, 0) if source_ip else None,
+                interface=interface,
+                timeout=1,
             )
             if sock.connect_ex(addr) == 0:
                 print_status("LAN > %-21s [ OPEN ]" % addr_to_str(addr))
@@ -119,7 +121,10 @@ class PortTest(object):
                 return -1
         except (OSError, socket.error) as ex:
             print_status("LAN > %-21s [ UNKNOWN ]" % addr_to_str(addr))
-            Logger.debug("Cannot test port %s from LAN because: %s" % (addr_to_str(addr), ex))
+            Logger.debug(
+                "Cannot test port %s from LAN because: %s"
+                % (addr_to_str(addr), ex)
+            )
             return 0
         finally:
             sock.close()
@@ -147,19 +152,21 @@ class PortTest(object):
         try:
             socket_set_opt(
                 sock,
-                bind_addr   = (source_ip, 0) if source_ip else None,
-                interface   = interface,
-                timeout     = 8
+                bind_addr=(source_ip, 0) if source_ip else None,
+                interface=interface,
+                timeout=8,
             )
             sock.connect(("ifconfig.co", 80))
-            sock.sendall((
-                "GET /port/%d HTTP/1.0\r\n"
-                "Host: ifconfig.co\r\n"
-                "User-Agent: curl/8.0.0 (Natter)\r\n"
-                "Accept: */*\r\n"
-                "Connection: close\r\n"
-                "\r\n" % port
-            ).encode())
+            sock.sendall(
+                (
+                    "GET /port/%d HTTP/1.0\r\n"
+                    "Host: ifconfig.co\r\n"
+                    "User-Agent: curl/8.0.0 (Natter)\r\n"
+                    "Accept: */*\r\n"
+                    "Connection: close\r\n"
+                    "\r\n" % port
+                ).encode()
+            )
             response = b""
             while True:
                 buff = sock.recv(4096)
@@ -170,8 +177,16 @@ class PortTest(object):
             _, content = response.split(b"\r\n\r\n", 1)
             dat = json.loads(content.decode())
             return 1 if dat["reachable"] else -1
-        except (OSError, LookupError, ValueError, TypeError, socket.error) as ex:
-            Logger.debug("Cannot test port %d from ifconfig.co because: %s" % (port, ex))
+        except (
+            OSError,
+            LookupError,
+            ValueError,
+            TypeError,
+            socket.error,
+        ) as ex:
+            Logger.debug(
+                "Cannot test port %d from ifconfig.co because: %s" % (port, ex)
+            )
             return 0
         finally:
             sock.close()
@@ -182,33 +197,43 @@ class PortTest(object):
         try:
             socket_set_opt(
                 sock,
-                bind_addr   = (source_ip, 0) if source_ip else None,
-                interface   = interface,
-                timeout     = 8
+                bind_addr=(source_ip, 0) if source_ip else None,
+                interface=interface,
+                timeout=8,
             )
             sock.connect(("portcheck.transmissionbt.com", 80))
-            sock.sendall((
-                "GET /%d HTTP/1.0\r\n"
-                "Host: portcheck.transmissionbt.com\r\n"
-                "User-Agent: curl/8.0.0 (Natter)\r\n"
-                "Accept: */*\r\n"
-                "Connection: close\r\n"
-                "\r\n" % port
-            ).encode())
+            sock.sendall(
+                (
+                    "GET /%d HTTP/1.0\r\n"
+                    "Host: portcheck.transmissionbt.com\r\n"
+                    "User-Agent: curl/8.0.0 (Natter)\r\n"
+                    "Accept: */*\r\n"
+                    "Connection: close\r\n"
+                    "\r\n" % port
+                ).encode()
+            )
             response = b""
             while True:
                 buff = sock.recv(4096)
                 if not buff:
                     break
                 response += buff
-            Logger.debug("port-test: portcheck.transmissionbt.com: %s" % response)
+            Logger.debug(
+                "port-test: portcheck.transmissionbt.com: %s" % response
+            )
             _, content = response.split(b"\r\n\r\n", 1)
             if content.strip() == b"1":
                 return 1
             elif content.strip() == b"0":
                 return -1
             raise ValueError("Unexpected response: %s" % response)
-        except (OSError, LookupError, ValueError, TypeError, socket.error) as ex:
+        except (
+            OSError,
+            LookupError,
+            ValueError,
+            TypeError,
+            socket.error,
+        ) as ex:
             Logger.debug(
                 "Cannot test port %d from portcheck.transmissionbt.com "
                 "because: %s" % (port, ex)
@@ -222,8 +247,14 @@ class StunClient(object):
     class ServerUnavailable(Exception):
         pass
 
-    def __init__(self, stun_server_list, source_host="0.0.0.0", source_port=0,
-                 interface=None, udp=False):
+    def __init__(
+        self,
+        stun_server_list,
+        source_host="0.0.0.0",
+        source_port=0,
+        interface=None,
+        udp=False,
+    ):
         if not stun_server_list:
             raise ValueError("STUN server list is empty")
         self.stun_server_list = stun_server_list
@@ -240,9 +271,10 @@ class StunClient(object):
             try:
                 return self._get_mapping()
             except StunClient.ServerUnavailable as ex:
-                Logger.warning("stun: STUN server %s is unavailable: %s" % (
-                    addr_to_uri(self.stun_server_list[0], udp = self.udp), ex
-                ))
+                Logger.warning(
+                    "stun: STUN server %s is unavailable: %s"
+                    % (addr_to_uri(self.stun_server_list[0], udp=self.udp), ex)
+                )
                 self.stun_server_list.append(self.stun_server_list.pop(0))
                 if self.stun_server_list[0] == first:
                     Logger.error("stun: No STUN server is available right now")
@@ -257,38 +289,52 @@ class StunClient(object):
         try:
             socket_set_opt(
                 sock,
-                reuse       = True,
-                bind_addr   = (self.source_host, self.source_port),
-                interface   = self.interface,
-                timeout     = 3
+                reuse=True,
+                bind_addr=(self.source_host, self.source_port),
+                interface=self.interface,
+                timeout=3,
             )
             sock.connect((stun_host, stun_port))
             inner_addr = sock.getsockname()
             self.source_host, self.source_port = inner_addr
-            sock.send(struct.pack(
-                "!LLLLL", 0x00010000, 0x2112a442, 0x4e415452,
-                random.getrandbits(32), random.getrandbits(32)
-            ))
+            sock.send(
+                struct.pack(
+                    "!LLLLL",
+                    0x00010000,
+                    0x2112A442,
+                    0x4E415452,
+                    random.getrandbits(32),
+                    random.getrandbits(32),
+                )
+            )
             buff = sock.recv(1500)
             ip = port = 0
             payload = buff[20:]
             while payload:
                 attr_type, attr_len = struct.unpack("!HH", payload[:4])
                 if attr_type in [1, 32]:
-                    _, _, port, ip = struct.unpack("!BBHL", payload[4:4+attr_len])
+                    _, _, port, ip = struct.unpack(
+                        "!BBHL", payload[4 : 4 + attr_len]
+                    )
                     if attr_type == 32:
                         port ^= 0x2112
-                        ip ^= 0x2112a442
+                        ip ^= 0x2112A442
                     break
-                payload = payload[4 + attr_len:]
+                payload = payload[4 + attr_len :]
             else:
                 raise ValueError("Invalid STUN response")
-            outer_addr = socket.inet_ntop(socket.AF_INET, struct.pack("!L", ip)), port
-            Logger.debug("stun: Got address %s from %s, source %s" % (
-                addr_to_uri(outer_addr, udp=self.udp),
-                addr_to_uri((stun_host, stun_port), udp=self.udp),
-                addr_to_uri(inner_addr, udp=self.udp)
-            ))
+            outer_addr = (
+                socket.inet_ntop(socket.AF_INET, struct.pack("!L", ip)),
+                port,
+            )
+            Logger.debug(
+                "stun: Got address %s from %s, source %s"
+                % (
+                    addr_to_uri(outer_addr, udp=self.udp),
+                    addr_to_uri((stun_host, stun_port), udp=self.udp),
+                    addr_to_uri(inner_addr, udp=self.udp),
+                )
+            )
             return inner_addr, outer_addr
         except (OSError, ValueError, struct.error, socket.error) as ex:
             raise StunClient.ServerUnavailable(ex)
@@ -297,7 +343,9 @@ class StunClient(object):
 
 
 class KeepAlive(object):
-    def __init__(self, host, port, source_host, source_port, interface=None, udp=False):
+    def __init__(
+        self, host, port, source_host, source_port, interface=None, udp=False
+    ):
         self.sock = None
         self.host = host
         self.port = port
@@ -317,16 +365,17 @@ class KeepAlive(object):
         try:
             socket_set_opt(
                 self.sock,
-                reuse       = True,
-                bind_addr   = (self.source_host, self.source_port),
-                interface   = self.interface,
-                timeout     = 3
+                reuse=True,
+                bind_addr=(self.source_host, self.source_port),
+                interface=self.interface,
+                timeout=3,
             )
             self.sock.connect((self.host, self.port))
             if not self.udp:
-                Logger.debug("keep-alive: Connected to host %s" % (
-                    addr_to_uri((self.host, self.port), udp=self.udp)
-                ))
+                Logger.debug(
+                    "keep-alive: Connected to host %s"
+                    % (addr_to_uri((self.host, self.port), udp=self.udp))
+                )
                 if self.reconn:
                     Logger.info("keep-alive: connection restored")
             self.reconn = False
@@ -352,14 +401,16 @@ class KeepAlive(object):
 
     def _keep_alive_tcp(self):
         # send a HTTP request
-        self.sock.sendall((
-            "HEAD /natter-keep-alive HTTP/1.1\r\n"
-            "Host: %s\r\n"
-            "User-Agent: curl/8.0.0 (Natter)\r\n"
-            "Accept: */*\r\n"
-            "Connection: keep-alive\r\n"
-            "\r\n" % self.host
-        ).encode())
+        self.sock.sendall(
+            (
+                "HEAD /natter-keep-alive HTTP/1.1\r\n"
+                "Host: %s\r\n"
+                "User-Agent: curl/8.0.0 (Natter)\r\n"
+                "Accept: */*\r\n"
+                "Connection: keep-alive\r\n"
+                "\r\n" % self.host
+            ).encode()
+        )
         buff = b""
         try:
             while True:
@@ -375,8 +426,16 @@ class KeepAlive(object):
         # send a DNS request
         self.sock.send(
             struct.pack(
-                "!HHHHHH", random.getrandbits(16), 0x0100, 0x0001, 0x0000, 0x0000, 0x0000
-            ) + b"\x09keepalive\x06natter\x00" + struct.pack("!HH", 0x0001, 0x0001)
+                "!HHHHHH",
+                random.getrandbits(16),
+                0x0100,
+                0x0001,
+                0x0000,
+                0x0000,
+                0x0000,
+            )
+            + b"\x09keepalive\x06natter\x00"
+            + struct.pack("!HH", 0x0001, 0x0001)
         )
         buff = b""
         try:
@@ -417,13 +476,11 @@ class ForwardTestServer(object):
         sock_type = socket.SOCK_DGRAM if udp else socket.SOCK_STREAM
         self.sock = socket.socket(socket.AF_INET, sock_type)
         try:
-            socket_set_opt(
-                self.sock,
-                reuse       = True,
-                bind_addr   = ("", port)
+            socket_set_opt(self.sock, reuse=True, bind_addr=("", port))
+            Logger.debug(
+                "fwd-test: Starting test server at %s"
+                % addr_to_uri((ip, port), udp=udp)
             )
-            Logger.debug("fwd-test: Starting test server at %s" %
-                         addr_to_uri((ip, port), udp=udp))
             if udp:
                 th = start_daemon_thread(self._test_server_run_udp)
             else:
@@ -447,7 +504,9 @@ class ForwardTestServer(object):
             try:
                 conn.settimeout(self.timeout)
                 conn.recv(self.buff_size)
-                content = "<html><body><h1>It works!</h1><hr/>Natter</body></html>"
+                content = (
+                    "<html><body><h1>It works!</h1><hr/>Natter</body></html>"
+                )
                 content_len = len(content.encode())
                 data = (
                     "HTTP/1.1 200 OK\r\n"
@@ -516,7 +575,9 @@ class ForwardIptables(object):
         m = re.search(r"iptables v([0-9]+)\.([0-9]+)\.([0-9]+)", output)
         if m:
             self.curr_ver = tuple(int(v) for v in m.groups())
-            Logger.debug("fwd-iptables: Found iptables %s" % str(self.curr_ver))
+            Logger.debug(
+                "fwd-iptables: Found iptables %s" % str(self.curr_ver)
+            )
             if self.curr_ver < self.min_ver:
                 return False
         else:
@@ -534,7 +595,7 @@ class ForwardIptables(object):
         try:
             subprocess.check_output(
                 self.iptables_cmd + ["-t", "nat", "--list-rules", "NATTER"],
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
             )
             return
         except subprocess.CalledProcessError:
@@ -544,7 +605,8 @@ class ForwardIptables(object):
             self.iptables_cmd + ["-t", "nat", "-N", "NATTER"]
         )
         subprocess.check_output(
-            self.iptables_cmd + ["-t", "nat", "-I", "PREROUTING", "-j", "NATTER"]
+            self.iptables_cmd
+            + ["-t", "nat", "-I", "PREROUTING", "-j", "NATTER"]
         )
         subprocess.check_output(
             self.iptables_cmd + ["-t", "nat", "-I", "OUTPUT", "-j", "NATTER"]
@@ -553,10 +615,12 @@ class ForwardIptables(object):
             self.iptables_cmd + ["-t", "nat", "-N", "NATTER_SNAT"]
         )
         subprocess.check_output(
-            self.iptables_cmd + ["-t", "nat", "-I", "POSTROUTING", "-j", "NATTER_SNAT"]
+            self.iptables_cmd
+            + ["-t", "nat", "-I", "POSTROUTING", "-j", "NATTER_SNAT"]
         )
         subprocess.check_output(
-            self.iptables_cmd + ["-t", "nat", "-I", "INPUT", "-j", "NATTER_SNAT"]
+            self.iptables_cmd
+            + ["-t", "nat", "-I", "INPUT", "-j", "NATTER_SNAT"]
         )
 
     def _iptables_clean(self):
@@ -565,44 +629,53 @@ class ForwardIptables(object):
             rule_rm = ["-D" if arg in ("-I", "-A") else arg for arg in rule]
             try:
                 subprocess.check_output(
-                    self.iptables_cmd + rule_rm,
-                    stderr=subprocess.STDOUT
+                    self.iptables_cmd + rule_rm, stderr=subprocess.STDOUT
                 )
             except subprocess.CalledProcessError as ex:
-                Logger.error("fwd-iptables: Failed to execute %s: %s" % (ex.cmd, ex.output))
+                Logger.error(
+                    "fwd-iptables: Failed to execute %s: %s"
+                    % (ex.cmd, ex.output)
+                )
                 continue
 
     def start_forward(self, ip, port, toip, toport, udp=False):
         if ip != toip:
             self._check_sys_forward_config()
         if (ip, port) == (toip, toport):
-            raise ValueError("Cannot forward to the same address %s" % addr_to_str((ip, port)))
+            raise ValueError(
+                "Cannot forward to the same address %s"
+                % addr_to_str((ip, port))
+            )
         proto = "udp" if udp else "tcp"
-        Logger.debug("fwd-iptables: Adding rule %s forward to %s" % (
-            addr_to_uri((ip, port), udp=udp), addr_to_uri((toip, toport), udp=udp)
-        ))
+        Logger.debug(
+            "fwd-iptables: Adding rule %s forward to %s"
+            % (
+                addr_to_uri((ip, port), udp=udp),
+                addr_to_uri((toip, toport), udp=udp),
+            )
+        )
         try:
             rule = [
-                "-t",       "nat",
-                "-I",       "NATTER",
-                "-p",       proto,
-                "--dst",    ip,
-                "--dport",  "%d" % port,
-                "-j",       "DNAT",
-                "--to-destination", "%s:%d" % (toip, toport)
-            ]
+                "-t", "nat",
+                "-I", "NATTER",
+                "-p", proto,
+                "--dst", ip,
+                "--dport", "%d" % port,
+                "-j", "DNAT",
+                "--to-destination", "%s:%d" % (toip, toport),
+            ]  # fmt: skip
             subprocess.check_output(self.iptables_cmd + rule)
             self.rules.append(rule)
             if self.snat:
                 rule = [
-                    "-t",       "nat",
-                    "-I",       "NATTER_SNAT",
-                    "-p",       proto,
-                    "--dst",    toip,
-                    "--dport",  "%d" % toport,
-                    "-j",       "SNAT",
-                    "--to-source", ip
-                ]
+                    "-t", "nat",
+                    "-I", "NATTER_SNAT",
+                    "-p", proto,
+                    "--dst", toip,
+                    "--dport", "%d" % toport,
+                    "-j", "SNAT",
+                    "--to-source", ip,
+                ]  # fmt: skip
                 subprocess.check_output(self.iptables_cmd + rule)
                 self.rules.append(rule)
         except Exception:
@@ -622,8 +695,10 @@ class ForwardIptables(object):
             with open(fpath, "r") as fin:
                 buff = fin.read()
             if buff.strip() != "1":
-                raise OSError("IP forwarding is not allowed. "
-                              "Please do `sysctl net.ipv4.ip_forward=1`")
+                raise OSError(
+                    "IP forwarding is not allowed. "
+                    "Please do `sysctl net.ipv4.ip_forward=1`"
+                )
         else:
             Logger.warning("fwd-iptables: '%s' not found" % str(fpath))
 
@@ -683,7 +758,7 @@ class ForwardNftables(object):
         try:
             subprocess.check_output(
                 self.nftables_cmd + ["list table ip natter"],
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
             )
             return
         except subprocess.CalledProcessError:
@@ -692,8 +767,7 @@ class ForwardNftables(object):
         # Priority values:
         #   dstnat (-100) - 5: -105
         #   srcnat ( 100) - 5:   95
-        initial_rules = (
-            '''
+        initial_rules = '''
             table ip natter {
                 chain natter_dnat { }
                 chain natter_snat { }
@@ -715,26 +789,23 @@ class ForwardNftables(object):
                 }
             }
             '''
-        )
         Logger.debug("fwd-nftables: Creating Natter table")
-        subprocess.check_output(
-            self.nftables_cmd + [initial_rules]
-        )
+        subprocess.check_output(self.nftables_cmd + [initial_rules])
 
     def _nftables_clean(self):
         Logger.debug("fwd-nftables: Cleaning up Natter rules")
         if self.handle > 0:
             subprocess.check_output(
-                self.nftables_cmd + [
-                    "delete rule ip natter natter_dnat handle %d" % self.handle
-                ]
+                self.nftables_cmd
+                + ["delete rule ip natter natter_dnat handle %d" % self.handle]
             )
             self.handle = -1
         if self.handle_snat > 0:
             subprocess.check_output(
-                self.nftables_cmd + [
+                self.nftables_cmd
+                + [
                     "delete rule ip natter natter_snat handle %d"
-                        % self.handle_snat
+                    % self.handle_snat
                 ]
             )
             self.handle_snat = -1
@@ -743,33 +814,42 @@ class ForwardNftables(object):
         if ip != toip:
             self._check_sys_forward_config()
         if (ip, port) == (toip, toport):
-            raise ValueError("Cannot forward to the same address %s" %
-                             addr_to_str((ip, port)))
+            raise ValueError(
+                "Cannot forward to the same address %s"
+                % addr_to_str((ip, port))
+            )
         proto = "udp" if udp else "tcp"
-        Logger.debug("fwd-nftables: Adding rule %s forward to %s" % (
-            addr_to_uri((ip, port), udp=udp),
-            addr_to_uri((toip, toport), udp=udp)
-        ))
+        Logger.debug(
+            "fwd-nftables: Adding rule %s forward to %s"
+            % (
+                addr_to_uri((ip, port), udp=udp),
+                addr_to_uri((toip, toport), udp=udp),
+            )
+        )
         try:
-            output = subprocess.check_output(self.nftables_cmd + [
-                "--echo", "--handle",
-                "insert rule ip natter natter_dnat ip daddr %s %s dport %d "
-                "dnat to %s:%d" % (
-                    ip, proto, port, toip, toport
-                )
-            ]).decode()
+            output = subprocess.check_output(
+                self.nftables_cmd
+                + [
+                    "--echo",
+                    "--handle",
+                    "insert rule ip natter natter_dnat ip daddr %s %s dport "
+                    "%d dnat to %s:%d" % (ip, proto, port, toip, toport),
+                ]
+            ).decode()
             m = re.search(r"# handle ([0-9]+)", output)
             if not m:
                 raise ValueError("Unknown nftables handle")
             self.handle = int(m.group(1))
             if self.snat:
-                output = subprocess.check_output(self.nftables_cmd + [
-                    "--echo", "--handle",
-                    "insert rule ip natter natter_snat ip daddr %s "
-                    "%s dport %d snat to %s" % (
-                        toip, proto, toport, ip
-                    )
-                ]).decode()
+                output = subprocess.check_output(
+                    self.nftables_cmd
+                    + [
+                        "--echo",
+                        "--handle",
+                        "insert rule ip natter natter_snat ip daddr %s "
+                        "%s dport %d snat to %s" % (toip, proto, toport, ip),
+                    ]
+                ).decode()
                 m = re.search(r"# handle ([0-9]+)", output)
                 if not m:
                     raise ValueError("Unknown nftables handle")
@@ -790,8 +870,10 @@ class ForwardNftables(object):
             with open(fpath, "r") as fin:
                 buff = fin.read()
             if buff.strip() != "1":
-                raise OSError("IP forwarding is not allowed. "
-                              "Please do `sysctl net.ipv4.ip_forward=1`")
+                raise OSError(
+                    "IP forwarding is not allowed. "
+                    "Please do `sysctl net.ipv4.ip_forward=1`"
+                )
         else:
             Logger.warning("fwd-nftables: '%s' not found" % str(fpath))
 
@@ -838,13 +920,18 @@ class ForwardGost(object):
 
     def start_forward(self, ip, port, toip, toport, udp=False):
         if (ip, port) == (toip, toport):
-            raise ValueError("Cannot forward to the same address %s" %
-                             addr_to_str((ip, port)))
+            raise ValueError(
+                "Cannot forward to the same address %s"
+                % addr_to_str((ip, port))
+            )
         proto = "udp" if udp else "tcp"
-        Logger.debug("fwd-gost: Starting gost %s forward to %s" % (
-            addr_to_uri((ip, port), udp=udp),
-            addr_to_uri((toip, toport), udp=udp)
-        ))
+        Logger.debug(
+            "fwd-gost: Starting gost %s forward to %s"
+            % (
+                addr_to_uri((ip, port), udp=udp),
+                addr_to_uri((toip, toport), udp=udp),
+            )
+        )
         gost_arg = "-L=%s://:%d/%s:%d" % (proto, port, toip, toport)
         if udp:
             gost_arg += "?ttl=%ds" % self.udp_timeout
@@ -896,19 +983,30 @@ class ForwardSocat(object):
 
     def start_forward(self, ip, port, toip, toport, udp=False):
         if (ip, port) == (toip, toport):
-            raise ValueError("Cannot forward to the same address %s" % addr_to_str((ip, port)))
+            raise ValueError(
+                "Cannot forward to the same address %s"
+                % addr_to_str((ip, port))
+            )
         proto = "UDP" if udp else "TCP"
-        Logger.debug("fwd-socat: Starting socat %s forward to %s" % (
-            addr_to_uri((ip, port), udp=udp), addr_to_uri((toip, toport), udp=udp)
-        ))
+        Logger.debug(
+            "fwd-socat: Starting socat %s forward to %s"
+            % (
+                addr_to_uri((ip, port), udp=udp),
+                addr_to_uri((toip, toport), udp=udp),
+            )
+        )
         if udp:
             socat_cmd = ["socat", "-T%d" % self.udp_timeout]
         else:
             socat_cmd = ["socat"]
-        self.proc = subprocess.Popen(socat_cmd + [
-            "%s4-LISTEN:%d,reuseaddr,fork,max-children=%d" % (proto, port, self.max_children),
-            "%s4:%s:%d" % (proto, toip, toport)
-        ])
+        self.proc = subprocess.Popen(
+            socat_cmd
+            + [
+                "%s4-LISTEN:%d,reuseaddr,fork,max-children=%d"
+                % (proto, port, self.max_children),
+                "%s4:%s:%d" % (proto, toip, toport),
+            ]
+        )
         try:
             time.sleep(1)
             if self.proc.poll() is not None:
@@ -942,21 +1040,22 @@ class ForwardSocket(object):
 
     def start_forward(self, ip, port, toip, toport, udp=False):
         if (ip, port) == (toip, toport):
-            raise ValueError("Cannot forward to the same address %s" %
-                             addr_to_str((ip, port)))
+            raise ValueError(
+                "Cannot forward to the same address %s"
+                % addr_to_str((ip, port))
+            )
         self.sock_type = socket.SOCK_DGRAM if udp else socket.SOCK_STREAM
         self.sock = socket.socket(socket.AF_INET, self.sock_type)
         try:
-            socket_set_opt(
-                self.sock,
-                reuse       = True,
-                bind_addr   = ("", port)
-            )
+            socket_set_opt(self.sock, reuse=True, bind_addr=("", port))
             self.outbound_addr = toip, toport
-            Logger.debug("fwd-socket: Starting socket %s forward to %s" % (
-                addr_to_uri((ip, port), udp=udp),
-                addr_to_uri((toip, toport), udp=udp)
-            ))
+            Logger.debug(
+                "fwd-socket: Starting socket %s forward to %s"
+                % (
+                    addr_to_uri((ip, port), udp=udp),
+                    addr_to_uri((toip, toport), udp=udp),
+                )
+            )
             if udp:
                 th = start_daemon_thread(self._socket_udp_recvfrom)
             else:
@@ -977,7 +1076,10 @@ class ForwardSocket(object):
                 sock_inbound, _ = self.sock.accept()
             except (OSError, socket.error) as ex:
                 if not closed_socket_ex(ex):
-                    Logger.error("fwd-socket: socket listening thread is exiting: %s" % ex)
+                    Logger.error(
+                        "fwd-socket: socket listening thread is exiting: %s"
+                        % ex
+                    )
                 return
             sock_outbound = socket.socket(socket.AF_INET, self.sock_type)
             try:
@@ -986,8 +1088,14 @@ class ForwardSocket(object):
                 sock_outbound.settimeout(None)
                 if threading.active_count() >= self.max_threads:
                     raise OSError("Too many threads")
-                start_daemon_thread(self._socket_tcp_forward, args=(sock_inbound, sock_outbound))
-                start_daemon_thread(self._socket_tcp_forward, args=(sock_outbound, sock_inbound))
+                start_daemon_thread(
+                    self._socket_tcp_forward,
+                    args=(sock_inbound, sock_outbound),
+                )
+                start_daemon_thread(
+                    self._socket_tcp_forward,
+                    args=(sock_outbound, sock_inbound),
+                )
             except (OSError, socket.error) as ex:
                 Logger.error("fwd-socket: cannot forward port: %s" % ex)
                 sock_inbound.close()
@@ -1006,7 +1114,9 @@ class ForwardSocket(object):
                     return
         except (OSError, socket.error) as ex:
             if not closed_socket_ex(ex):
-                Logger.error("fwd-socket: socket forwarding thread is exiting: %s" % ex)
+                Logger.error(
+                    "fwd-socket: socket forwarding thread is exiting: %s" % ex
+                )
             sock_to_recv.close()
             sock_to_send.close()
             return
@@ -1019,16 +1129,23 @@ class ForwardSocket(object):
                 s = outbound_socks.get(addr)
             except (OSError, socket.error) as ex:
                 if not closed_socket_ex(ex):
-                    Logger.error("fwd-socket: socket recvfrom thread is exiting: %s" % ex)
+                    Logger.error(
+                        "fwd-socket: socket recvfrom thread is exiting: %s"
+                        % ex
+                    )
                 return
             try:
                 if not s:
-                    s = outbound_socks[addr] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    s = outbound_socks[addr] = socket.socket(
+                        socket.AF_INET, socket.SOCK_DGRAM
+                    )
                     s.settimeout(self.udp_timeout)
                     s.connect(self.outbound_addr)
                     if threading.active_count() >= self.max_threads:
                         raise OSError("Too many threads")
-                    start_daemon_thread(self._socket_udp_send, args=(self.sock, s, addr))
+                    start_daemon_thread(
+                        self._socket_udp_send, args=(self.sock, s, addr)
+                    )
                 if buff:
                     s.send(buff)
                 else:
@@ -1050,7 +1167,9 @@ class ForwardSocket(object):
                     outbound_sock.close()
         except (OSError, socket.error) as ex:
             if not closed_socket_ex(ex):
-                Logger.error("fwd-socket: socket send thread is exiting: %s" % ex)
+                Logger.error(
+                    "fwd-socket: socket send thread is exiting: %s" % ex
+                )
             outbound_sock.close()
             return
 
@@ -1063,20 +1182,21 @@ class ForwardSocket(object):
 
 
 class UPnPService(object):
-    def __init__(self, device, bind_ip = None, interface = None):
-        self.device             = device
-        self.service_type       = None
-        self.service_id         = None
-        self.scpd_url           = None
-        self.control_url        = None
-        self.eventsub_url       = None
-        self._sock_timeout      = 3
-        self._bind_ip           = bind_ip
-        self._bind_interface    = interface
+    def __init__(self, device, bind_ip=None, interface=None):
+        self.device = device
+        self.service_type = None
+        self.service_id = None
+        self.scpd_url = None
+        self.control_url = None
+        self.eventsub_url = None
+        self._sock_timeout = 3
+        self._bind_ip = bind_ip
+        self._bind_interface = interface
 
     def __repr__(self):
         return "<UPnPService service_type=%s, service_id=%s>" % (
-            repr(self.service_type), repr(self.service_id)
+            repr(self.service_type),
+            repr(self.service_id),
         )
 
     def is_valid(self):
@@ -1085,17 +1205,26 @@ class UPnPService(object):
         return False
 
     def is_forward(self):
-        if self.service_type in (
-            "urn:schemas-upnp-org:service:WANIPConnection:1",
-            "urn:schemas-upnp-org:service:WANIPConnection:2",
-            "urn:schemas-upnp-org:service:WANPPPConnection:1"
-        ) and self.service_id and self.control_url:
+        if (
+            self.service_type
+            in (
+                "urn:schemas-upnp-org:service:WANIPConnection:1",
+                "urn:schemas-upnp-org:service:WANIPConnection:2",
+                "urn:schemas-upnp-org:service:WANPPPConnection:1",
+            )
+            and self.service_id
+            and self.control_url
+        ):
             return True
         return False
 
-    def forward_port(self, host, port, dest_host, dest_port, udp=False, duration=0):
+    def forward_port(
+        self, host, port, dest_host, dest_port, udp=False, duration=0
+    ):
         if not self.is_forward():
-            raise NotImplementedError("Unsupported service type: %s" % self.service_type)
+            raise NotImplementedError(
+                "Unsupported service type: %s" % self.service_type
+            )
 
         proto = "UDP" if udp else "TCP"
         ctl_hostname, ctl_port, ctl_path = split_url(self.control_url)
@@ -1116,8 +1245,16 @@ class UPnPService(object):
             "      <NewLeaseDuration>%d</NewLeaseDuration>\r\n"
             "    </m:AddPortMapping>\r\n"
             "  </s:Body>\r\n"
-            "</s:Envelope>\r\n" % (
-                self.service_type, host, port, proto, dest_port, dest_host, descpt, duration
+            "</s:Envelope>\r\n"
+            % (
+                self.service_type,
+                host,
+                port,
+                proto,
+                dest_port,
+                dest_host,
+                descpt,
+                duration,
             )
         )
         content_len = len(content.encode())
@@ -1131,15 +1268,23 @@ class UPnPService(object):
             "Content-Length: %d\r\n"
             "Connection: close\r\n"
             "\r\n"
-            "%s" % (ctl_path, ctl_hostname, ctl_port, self.service_type, content_len, content)
+            "%s"
+            % (
+                ctl_path,
+                ctl_hostname,
+                ctl_port,
+                self.service_type,
+                content_len,
+                content,
+            )
         ).encode()
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             socket_set_opt(
                 sock,
-                bind_addr   = (self._bind_ip, 0) if self._bind_ip else None,
-                interface   = self._bind_interface,
-                timeout     = self._sock_timeout
+                bind_addr=(self._bind_ip, 0) if self._bind_ip else None,
+                interface=self._bind_interface,
+                timeout=self._sock_timeout,
             )
             sock.connect((ctl_hostname, ctl_port))
             sock.sendall(data)
@@ -1156,19 +1301,22 @@ class UPnPService(object):
         m = re.search(r"<errorCode\s*>([^<]*?)</errorCode\s*>", r)
         if m:
             errno = m.group(1).strip()
-        m = re.search(r"<errorDescription\s*>([^<]*?)</errorDescription\s*>", r)
+        m = re.search(
+            r"<errorDescription\s*>([^<]*?)</errorDescription\s*>", r
+        )
         if m:
             errmsg = m.group(1).strip()
         if errno or errmsg:
-            Logger.error("upnp: Error from service %s of device %s: [%s] %s" % (
-                self.service_type, self.device, errno, errmsg
-            ))
+            Logger.error(
+                "upnp: Error from service %s of device %s: [%s] %s"
+                % (self.service_type, self.device, errno, errmsg)
+            )
             return False
         return True
 
 
 class UPnPDevice(object):
-    def __init__(self, ipaddr, xml_urls, bind_ip = None, interface = None):
+    def __init__(self, ipaddr, xml_urls, bind_ip=None, interface=None):
         self.ipaddr = ipaddr
         self.xml_urls = xml_urls
         self.services = []
@@ -1178,14 +1326,12 @@ class UPnPDevice(object):
         self._bind_interface = interface
 
     def __repr__(self):
-        return "<UPnPDevice ipaddr=%s>" % (
-            repr(self.ipaddr),
-        )
+        return "<UPnPDevice ipaddr=%s>" % (repr(self.ipaddr),)
 
     def _load_services(self):
         if self.services:
             return
-        services_d = {}     # service_id => UPnPService()
+        services_d = {}  # service_id => UPnPService()
         for url in self.xml_urls:
             sd = self._get_srv_dict(url)
             services_d.update(sd)
@@ -1201,9 +1347,9 @@ class UPnPDevice(object):
         try:
             socket_set_opt(
                 sock,
-                bind_addr   = (self._bind_ip, 0) if self._bind_ip else None,
-                interface   = self._bind_interface,
-                timeout     = self._sock_timeout
+                bind_addr=(self._bind_ip, 0) if self._bind_ip else None,
+                interface=self._bind_interface,
+                timeout=self._sock_timeout,
             )
             sock.connect((hostname, port))
             data = (
@@ -1235,45 +1381,55 @@ class UPnPDevice(object):
         try:
             xmlcontent = self._http_get(url).decode("utf-8", "ignore")
         except (OSError, socket.error, ValueError) as ex:
-            Logger.warning("upnp: failed to load service from %s: %s" % (url, ex))
+            Logger.warning(
+                "upnp: failed to load service from %s: %s" % (url, ex)
+            )
             return services_d
-        srv_str_l = re.findall(r"<service\s*>([\s\S]+?)</service\s*>", xmlcontent)
+        srv_str_l = re.findall(
+            r"<service\s*>([\s\S]+?)</service\s*>", xmlcontent
+        )
         for srv_str in srv_str_l:
-            srv = UPnPService(self, bind_ip=self._bind_ip, interface=self._bind_interface)
-            m = re.search(r"<serviceType\s*>([^<]*?)</serviceType\s*>", srv_str)
+            srv = UPnPService(
+                self, bind_ip=self._bind_ip, interface=self._bind_interface
+            )
+            m = re.search(
+                r"<serviceType\s*>([^<]*?)</serviceType\s*>", srv_str
+            )
             if m:
-                srv.service_type    = m.group(1).strip()
+                srv.service_type = m.group(1).strip()
             m = re.search(r"<serviceId\s*>([^<]*?)</serviceId\s*>", srv_str)
             if m:
-                srv.service_id      = m.group(1).strip()
+                srv.service_id = m.group(1).strip()
             m = re.search(r"<SCPDURL\s*>([^<]*?)</SCPDURL\s*>", srv_str)
             if m:
-                srv.scpd_url        = full_url(m.group(1).strip(), url)
+                srv.scpd_url = full_url(m.group(1).strip(), url)
             m = re.search(r"<controlURL\s*>([^<]*?)</controlURL\s*>", srv_str)
             if m:
-                srv.control_url     = full_url(m.group(1).strip(), url)
-            m = re.search(r"<eventSubURL\s*>([^<]*?)</eventSubURL\s*>", srv_str)
+                srv.control_url = full_url(m.group(1).strip(), url)
+            m = re.search(
+                r"<eventSubURL\s*>([^<]*?)</eventSubURL\s*>", srv_str
+            )
             if m:
-                srv.eventsub_url    = full_url(m.group(1).strip(), url)
+                srv.eventsub_url = full_url(m.group(1).strip(), url)
             if srv.is_valid():
                 services_d[srv.service_id] = srv
         return services_d
 
 
 class UPnPClient(object):
-    def __init__(self, bind_ip = None, interface = None):
-        self.ssdp_addr          = ("239.255.255.250", 1900)
-        self.router             = None
-        self._sock_timeout      = 1
-        self._fwd_host          = None
-        self._fwd_port          = None
-        self._fwd_dest_host     = None
-        self._fwd_dest_port     = None
-        self._fwd_udp           = False
-        self._fwd_duration      = 0
-        self._fwd_started       = False
-        self._bind_ip           = bind_ip
-        self._bind_interface    = interface
+    def __init__(self, bind_ip=None, interface=None):
+        self.ssdp_addr = ("239.255.255.250", 1900)
+        self.router = None
+        self._sock_timeout = 1
+        self._fwd_host = None
+        self._fwd_port = None
+        self._fwd_dest_host = None
+        self._fwd_dest_port = None
+        self._fwd_udp = False
+        self._fwd_duration = 0
+        self._fwd_started = False
+        self._bind_ip = bind_ip
+        self._bind_interface = interface
 
     def discover_router(self):
         router_l = []
@@ -1298,10 +1454,10 @@ class UPnPClient(object):
         try:
             socket_set_opt(
                 sock,
-                reuse       = True,
-                bind_addr   = (self._bind_ip, 0) if self._bind_ip else None,
-                interface   = self._bind_interface,
-                timeout     = self._sock_timeout
+                reuse=True,
+                bind_addr=(self._bind_ip, 0) if self._bind_ip else None,
+                interface=self._bind_interface,
+                timeout=self._sock_timeout,
             )
             dat01 = (
                 "M-SEARCH * HTTP/1.1\r\n"
@@ -1328,8 +1484,10 @@ class UPnPClient(object):
             while True:
                 try:
                     buff, addr = sock.recvfrom(4096)
-                    m = re.search(r"LOCATION: *(http://[^\[]\S+)\s+",
-                                  buff.decode("utf-8"))
+                    m = re.search(
+                        r"LOCATION: *(http://[^\[]\S+)\s+",
+                        buff.decode("utf-8"),
+                    )
                     if not m:
                         continue
                     ipaddr = addr[0]
@@ -1346,7 +1504,12 @@ class UPnPClient(object):
 
         devs = []
         for ipaddr, urls in upnp_urls_d.items():
-            d = UPnPDevice(ipaddr, urls, bind_ip=self._bind_ip, interface=self._bind_interface)
+            d = UPnPDevice(
+                ipaddr,
+                urls,
+                bind_ip=self._bind_ip,
+                interface=self._bind_interface,
+            )
             d._load_services()
             devs.append(d)
 
@@ -1355,21 +1518,27 @@ class UPnPClient(object):
     def forward(self, host, port, dest_host, dest_port, udp=False, duration=0):
         if not self.router:
             raise RuntimeError("No router is available")
-        self.router.forward_srv.forward_port(host, port, dest_host, dest_port, udp, duration)
-        self._fwd_host      = host
-        self._fwd_port      = port
+        self.router.forward_srv.forward_port(
+            host, port, dest_host, dest_port, udp, duration
+        )
+        self._fwd_host = host
+        self._fwd_port = port
         self._fwd_dest_host = dest_host
         self._fwd_dest_port = dest_port
-        self._fwd_udp       = udp
-        self._fwd_duration  = duration
-        self._fwd_started   = True
+        self._fwd_udp = udp
+        self._fwd_duration = duration
+        self._fwd_started = True
 
     def renew(self):
         if not self._fwd_started:
             raise RuntimeError("UPnP forward not started")
         self.router.forward_srv.forward_port(
-            self._fwd_host, self._fwd_port, self._fwd_dest_host,
-            self._fwd_dest_port, self._fwd_udp, self._fwd_duration
+            self._fwd_host,
+            self._fwd_port,
+            self._fwd_dest_host,
+            self._fwd_dest_port,
+            self._fwd_udp,
+            self._fwd_duration,
         )
         Logger.debug("upnp: OK")
 
@@ -1382,7 +1551,9 @@ class NatterRetryException(Exception):
     pass
 
 
-def socket_set_opt(sock, reuse=False, bind_addr=None, interface=None, timeout=-1):
+def socket_set_opt(
+    sock, reuse=False, bind_addr=None, interface=None, timeout=-1
+):
     if reuse:
         if hasattr(socket, "SO_REUSEADDR"):
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -1391,10 +1562,14 @@ def socket_set_opt(sock, reuse=False, bind_addr=None, interface=None, timeout=-1
     if interface is not None:
         if hasattr(socket, "SO_BINDTODEVICE"):
             sock.setsockopt(
-                socket.SOL_SOCKET, socket.SO_BINDTODEVICE, interface.encode() + b"\0"
+                socket.SOL_SOCKET,
+                socket.SO_BINDTODEVICE,
+                interface.encode() + b"\0",
             )
         else:
-            raise RuntimeError("Binding to an interface is not supported on your platform.")
+            raise RuntimeError(
+                "Binding to an interface is not supported on your platform."
+            )
     if bind_addr is not None:
         sock.bind(bind_addr)
     if timeout != -1:
@@ -1425,28 +1600,32 @@ def closed_socket_ex(ex):
     return False
 
 
-def fix_codecs(codec_list = ["utf-8", "idna"]):
+def fix_codecs(codec_list=["utf-8", "idna"]):
     missing_codecs = []
     for codec_name in codec_list:
         try:
             codecs.lookup(codec_name)
         except LookupError:
             missing_codecs.append(codec_name.lower())
+
     def search_codec(name):
         if name.lower() in missing_codecs:
-            return codecs.CodecInfo(codecs.ascii_encode, codecs.ascii_decode, name="ascii")
+            return codecs.CodecInfo(
+                codecs.ascii_encode, codecs.ascii_decode, name="ascii"
+            )
+
     if missing_codecs:
         codecs.register(search_codec)
 
 
 def run_natter_check():
     try:
-        modcheck = __import__('natter-check', None, None, ['natter-check'])
+        modcheck = __import__("natter-check", None, None, ["natter-check"])
     except ImportError:
         raise RuntimeError("natter-check.py is missing") from None
 
-    if hasattr(modcheck, 'natter-check'):
-        modcheck = modcheck.__dict__['natter-check']
+    if hasattr(modcheck, "natter-check"):
+        modcheck = modcheck.__dict__["natter-check"]
 
     modcheck.main()
 
@@ -1465,9 +1644,13 @@ def check_docker_network():
     try:
         ipaddr = socket.gethostbyname(hostname)
     except socket.gaierror:
-        Logger.warning("check-docket-network: Cannot resolve hostname `%s`" % hostname)
+        Logger.warning(
+            "check-docket-network: Cannot resolve hostname `%s`" % hostname
+        )
         return
-    docker_macaddr = "02:42:" + ":".join(["%02x" % int(x) for x in ipaddr.split(".")])
+    docker_macaddr = "02:42:" + ":".join(
+        ["%02x" % int(x) for x in ipaddr.split(".")]
+    )
     if macaddr == docker_macaddr:
         raise RuntimeError("Docker's `--net=host` option is required.")
 
@@ -1477,14 +1660,15 @@ def check_docker_network():
     uname_r = fo.read().strip()
     fo.close()
     uname_r_sfx = uname_r.rsplit("-").pop()
-    if uname_r_sfx.lower() in ["linuxkit", "wsl2"] and hostname.lower() == "docker-desktop":
+    if (
+        uname_r_sfx.lower() in ["linuxkit", "wsl2"]
+        and hostname.lower() == "docker-desktop"
+    ):
         raise RuntimeError("Network from Docker Desktop is not supported.")
 
 
 def split_url(url):
-    m = re.match(
-        r"^http://([^\[\]:/]+)(?:\:([0-9]+))?(/\S*)?$", url
-    )
+    m = re.match(r"^http://([^\[\]:/]+)(?:\:([0-9]+))?(/\S*)?$", url)
     if not m:
         raise ValueError("Unsupported URL: %s" % url)
     hostname, port_str, path = m.groups()
@@ -1572,14 +1756,18 @@ def set_reuse_port(port):
         return
 
 
-def natter_main(show_title = True):
+def natter_main(show_title=True):
     argp = argparse.ArgumentParser(
-        description="Expose your port behind full-cone NAT to the Internet.", add_help=False
+        description="Expose your port behind full-cone NAT to the Internet.",
+        add_help=False,
     )
     group = argp.add_argument_group("options")
     group.add_argument(
-        "--version", "-V", action="version", version="Natter %s" % __version__,
-        help="show the version of Natter and exit"
+        "--version",
+        "-V",
+        action="version",
+        version="Natter %s" % __version__,
+        help="show the version of Natter and exit",
     )
     group.add_argument(
         "--help", action="help", help="show this help message and exit"
@@ -1593,53 +1781,75 @@ def natter_main(show_title = True):
     group.add_argument(
         "-q", action="store_true", help="exit when mapped address is changed"
     )
-    group.add_argument(
-        "-u", action="store_true", help="UDP mode"
-    )
+    group.add_argument("-u", action="store_true", help="UDP mode")
     group.add_argument(
         "-U", action="store_true", help="enable UPnP/IGD discovery"
     )
     group.add_argument(
-        "-k", type=int, metavar="<interval>", default=15,
-        help="seconds between each keep-alive"
+        "-k",
+        type=int,
+        metavar="<interval>",
+        default=15,
+        help="seconds between each keep-alive",
     )
     group.add_argument(
-        "-s", metavar="<address>", action="append",
-        help="hostname or address to STUN server"
+        "-s",
+        metavar="<address>",
+        action="append",
+        help="hostname or address to STUN server",
     )
     group.add_argument(
-        "-h", type=str, metavar="<address>", default=None,
-        help="hostname or address to keep-alive server"
+        "-h",
+        type=str,
+        metavar="<address>",
+        default=None,
+        help="hostname or address to keep-alive server",
     )
     group.add_argument(
-        "-e", type=str, metavar="<path>", default=None,
-        help="script path for notifying mapped address"
+        "-e",
+        type=str,
+        metavar="<path>",
+        default=None,
+        help="script path for notifying mapped address",
     )
     group = argp.add_argument_group("bind options")
     group.add_argument(
-        "-i", type=str, metavar="<interface>", default="0.0.0.0",
-        help="network interface name or IP to bind"
+        "-i",
+        type=str,
+        metavar="<interface>",
+        default="0.0.0.0",
+        help="network interface name or IP to bind",
     )
     group.add_argument(
-        "-b", type=int, metavar="<port>", default=0,
-        help="port number to bind"
+        "-b", type=int, metavar="<port>", default=0, help="port number to bind"
     )
     group = argp.add_argument_group("forward options")
     group.add_argument(
-        "-m", type=str, metavar="<method>", default=None,
+        "-m",
+        type=str,
+        metavar="<method>",
+        default=None,
         help="forward method, common values are 'iptables', 'nftables', "
-             "'socat', 'gost' and 'socket'"
+        "'socat', 'gost' and 'socket'",
     )
     group.add_argument(
-        "-t", type=str, metavar="<address>", default="0.0.0.0",
-        help="IP address of forward target"
+        "-t",
+        type=str,
+        metavar="<address>",
+        default="0.0.0.0",
+        help="IP address of forward target",
     )
     group.add_argument(
-        "-p", type=int, metavar="<port>", default=0,
-        help="port number of forward target"
+        "-p",
+        type=int,
+        metavar="<port>",
+        default=0,
+        help="port number of forward target",
     )
     group.add_argument(
-        "-r", action="store_true", help="keep retrying until the port of forward target is open"
+        "-r",
+        action="store_true",
+        help="keep retrying until the port of forward target is open",
     )
 
     args = argp.parse_args()
@@ -1698,19 +1908,17 @@ def natter_main(show_title = True):
             "stun.sipnet.com",
             "stun.radiojar.com",
             "stun.sonetel.com",
-            "stun.telnyx.com"
+            "stun.telnyx.com",
         ]
         if not udp_mode:
-            stun_list = stun_list + [
-                "turn.cloud-rtc.com:80"
-            ]
+            stun_list = stun_list + ["turn.cloud-rtc.com:80"]
         else:
             stun_list = [
                 "stun.miwifi.com",
                 "stun.chat.bilibili.com",
                 "stun.hitv.com",
                 "stun.cdnbye.com",
-                "stun.douyucdn.cn:18000"
+                "stun.douyucdn.cn:18000",
             ] + stun_list
 
     if not keepalive_srv:
@@ -1721,7 +1929,9 @@ def natter_main(show_title = True):
     stun_srv_list = []
     for item in stun_list:
         l = item.split(":", 2) + ["3478"]
-        stun_srv_list.append((l[0], int(l[1])),)
+        stun_srv_list.append(
+            (l[0], int(l[1])),
+        )
 
     if udp_mode:
         l = keepalive_srv.split(":", 2) + ["53"]
@@ -1732,8 +1942,13 @@ def natter_main(show_title = True):
 
     # forward method defaults
     if not method:
-        if to_ip == "0.0.0.0" and to_port == 0 and \
-                bind_ip == "0.0.0.0" and bind_port == 0 and bind_interface is None:
+        if (
+            to_ip == "0.0.0.0"
+            and to_port == 0
+            and bind_ip == "0.0.0.0"
+            and bind_port == 0
+            and bind_interface is None
+        ):
             method = "test"
         elif to_ip == "0.0.0.0" and to_port == 0:
             method = "none"
@@ -1781,35 +1996,54 @@ def natter_main(show_title = True):
     forwarder = ForwardImpl()
     port_test = PortTest()
 
-    stun = StunClient(stun_srv_list, bind_ip, bind_port, udp=udp_mode, interface=bind_interface)
+    stun = StunClient(
+        stun_srv_list,
+        bind_ip,
+        bind_port,
+        udp=udp_mode,
+        interface=bind_interface,
+    )
     natter_addr, outer_addr = stun.get_mapping()
     # set actual ip and port for keep-alive socket to bind, instead of zero
     bind_ip, bind_port = natter_addr
 
-    keep_alive = KeepAlive(keepalive_host, keepalive_port, bind_ip, bind_port, udp=udp_mode, interface=bind_interface)
+    keep_alive = KeepAlive(
+        keepalive_host,
+        keepalive_port,
+        bind_ip,
+        bind_port,
+        udp=udp_mode,
+        interface=bind_interface,
+    )
     keep_alive.keep_alive()
 
-    # get the mapped address again after the keep-alive connection is established
+    # get the mapped address again after the keep-alive connection is
+    # established
     outer_addr_prev = outer_addr
     natter_addr, outer_addr = stun.get_mapping()
     if outer_addr != outer_addr_prev:
         Logger.warning("Network is unstable, or not full cone")
 
     # set actual ip of localhost for correct forwarding
-    if socket.inet_aton(to_ip) in [socket.inet_aton("127.0.0.1"), socket.inet_aton("0.0.0.0")]:
+    if socket.inet_aton(to_ip) in [
+        socket.inet_aton("127.0.0.1"),
+        socket.inet_aton("0.0.0.0"),
+    ]:
         to_ip = natter_addr[0]
 
     # if not specified, the target port is set to be the same as the outer port
     if not to_port:
         to_port = outer_addr[1]
 
-    # some exceptions: ForwardNone and ForwardTestServer are not real forward methods,
-    # so let target ip and port equal to natter's
+    # some exceptions: ForwardNone and ForwardTestServer are not real forward
+    # methods, so let target ip and port equal to natter's
     if ForwardImpl in (ForwardNone, ForwardTestServer):
         to_ip, to_port = natter_addr
 
     to_addr = (to_ip, to_port)
-    forwarder.start_forward(natter_addr[0], natter_addr[1], to_addr[0], to_addr[1], udp=udp_mode)
+    forwarder.start_forward(
+        natter_addr[0], natter_addr[1], to_addr[0], to_addr[1], udp=udp_mode
+    )
     NatterExit.set_atexit(forwarder.stop_forward)
 
     # UPnP
@@ -1829,7 +2063,14 @@ def natter_main(show_title = True):
     if upnp_router:
         Logger.info("[UPnP] Found router %s" % upnp_router.ipaddr)
         try:
-            upnp.forward("", bind_port, bind_ip, bind_port, udp=udp_mode, duration=interval*3)
+            upnp.forward(
+                "",
+                bind_port,
+                bind_ip,
+                bind_port,
+                udp=udp_mode,
+                duration=interval * 3,
+            )
         except (OSError, socket.error, ValueError) as ex:
             Logger.error("upnp: failed to forward port: %s" % ex)
         else:
@@ -1839,9 +2080,13 @@ def natter_main(show_title = True):
     Logger.info()
     route_str = ""
     if ForwardImpl not in (ForwardNone, ForwardTestServer):
-        route_str += "%s <--%s--> " % (addr_to_uri(to_addr, udp=udp_mode), method)
+        route_str += "%s <--%s--> " % (
+            addr_to_uri(to_addr, udp=udp_mode),
+            method,
+        )
     route_str += "%s <--Natter--> %s" % (
-        addr_to_uri(natter_addr, udp=udp_mode), addr_to_uri(outer_addr, udp=udp_mode)
+        addr_to_uri(natter_addr, udp=udp_mode),
+        addr_to_uri(outer_addr, udp=udp_mode),
     )
     Logger.info(route_str)
     Logger.info()
@@ -1849,7 +2094,10 @@ def natter_main(show_title = True):
     # Test mode notice
     if ForwardImpl == ForwardTestServer:
         Logger.info("Test mode in on.")
-        Logger.info("Please check [ %s://%s ]" % ("udp" if udp_mode else "http", addr_to_str(outer_addr)))
+        Logger.info(
+            "Please check [ %s://%s ]"
+            % ("udp" if udp_mode else "http", addr_to_str(outer_addr))
+        )
         Logger.info()
 
     # Call notification script
@@ -1858,16 +2106,34 @@ def natter_main(show_title = True):
         inner_ip, inner_port = to_addr if method else natter_addr
         outer_ip, outer_port = outer_addr
         Logger.info("Calling script: %s" % notify_sh)
-        subprocess.call([
-            os.path.abspath(notify_sh), protocol, str(inner_ip), str(inner_port), str(outer_ip), str(outer_port)
-        ], shell=False)
+        subprocess.call(
+            [
+                os.path.abspath(notify_sh),
+                protocol,
+                str(inner_ip),
+                str(inner_port),
+                str(outer_ip),
+                str(outer_port),
+            ],
+            shell=False,
+        )
 
     # Display check results, TCP only
     if not udp_mode:
         ret1 = port_test.test_lan(to_addr, info=True)
         ret2 = port_test.test_lan(natter_addr, info=True)
-        ret3 = port_test.test_lan(outer_addr, source_ip=natter_addr[0], interface=bind_interface, info=True)
-        ret4 = port_test.test_wan(outer_addr, source_ip=natter_addr[0], interface=bind_interface, info=True)
+        ret3 = port_test.test_lan(
+            outer_addr,
+            source_ip=natter_addr[0],
+            interface=bind_interface,
+            info=True,
+        )
+        ret4 = port_test.test_wan(
+            outer_addr,
+            source_ip=natter_addr[0],
+            interface=bind_interface,
+            info=True,
+        )
         if ret1 == -1:
             Logger.warning("!! Target port is closed !!")
         elif ret1 == 1 and ret3 == ret4 == -1:
@@ -1896,7 +2162,15 @@ def natter_main(show_title = True):
             Logger.debug("Start recheck")
             need_recheck = False
             # check LAN port first
-            if udp_mode or port_test.test_lan(outer_addr, source_ip=natter_addr[0], interface=bind_interface) == -1:
+            if (
+                udp_mode
+                or port_test.test_lan(
+                    outer_addr,
+                    source_ip=natter_addr[0],
+                    interface=bind_interface,
+                )
+                == -1
+            ):
                 # then check through STUN
                 _, outer_addr_curr = stun.get_mapping()
                 if outer_addr_curr != outer_addr:
@@ -1904,7 +2178,10 @@ def natter_main(show_title = True):
                     keep_alive.disconnect()
                     # exit or retry
                     if exit_when_changed:
-                        Logger.info("Natter is exiting because mapped address has changed")
+                        Logger.info(
+                            "Natter is exiting because mapped address has "
+                            "changed"
+                        )
                         raise NatterExitException("Mapped address has changed")
                     raise NatterRetryException("Mapped address has changed")
         # end of recheck
@@ -1912,11 +2189,15 @@ def natter_main(show_title = True):
         try:
             keep_alive.keep_alive()
         except (OSError, socket.error) as ex:
-            if hasattr(errno, "EADDRNOTAVAIL") and \
-                    ex.errno == errno.EADDRNOTAVAIL:
+            if (
+                hasattr(errno, "EADDRNOTAVAIL")
+                and ex.errno == errno.EADDRNOTAVAIL
+            ):
                 if exit_when_changed:
-                    Logger.info("Natter is exiting because local IP address "
-                                "has changed")
+                    Logger.info(
+                        "Natter is exiting because local IP address "
+                        "has changed"
+                    )
                     raise NatterExitException("Local IP address has changed")
                 raise NatterRetryException("Local IP address has changed")
             if udp_mode:
@@ -1936,7 +2217,7 @@ def natter_main(show_title = True):
 
 
 def main():
-    signal.signal(signal.SIGTERM, lambda s,f: sys.exit(143))
+    signal.signal(signal.SIGTERM, lambda s, f: sys.exit(143))
     fix_codecs()
     show_title = True
     while True:

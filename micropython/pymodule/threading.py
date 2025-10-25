@@ -3,17 +3,16 @@
 
 import _thread
 
-__all__ = [
-    'Thread', 'active_count', 'current_thread', 'main_thread'
-]
+__all__ = ["Thread", "active_count", "current_thread", "main_thread"]
 
 
 class Thread(object):
     _lock = _thread.allocate_lock()
     _active = dict()
 
-    def __init__(self, group=None, target=None, name=None, args=(),
-                 kwargs=None):
+    def __init__(
+        self, group=None, target=None, name=None, args=(), kwargs=None
+    ):
         if group is not None:
             raise NotImplementedError("group argument must be None for now")
         if kwargs is None:
@@ -58,12 +57,14 @@ class Thread(object):
             raise RuntimeError("thread.__init__() not called")
         if self._start_called:
             raise RuntimeError("threads can only be started once")
+
         def _entry():
             self._pre_run()
             try:
                 self.run()
             finally:
                 self._post_run()
+
         self._start_called = True
         _thread.start_new_thread(_entry, ())
 

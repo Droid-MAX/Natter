@@ -5,6 +5,7 @@
 #   Regular expression syntax supported is a subset of CPython re module.
 
 import sys as _sys
+
 _path = _sys.path
 _sys.path = ()
 try:
@@ -14,7 +15,14 @@ finally:
     del _path
 
 __all__ = [
-    'Match', 'Pattern', 'compile', 'findall', 'match', 'search', 'split', 'sub'
+    "Match",
+    "Pattern",
+    "compile",
+    "findall",
+    "match",
+    "search",
+    "split",
+    "sub",
 ]
 
 
@@ -22,7 +30,7 @@ _default = object()
 
 
 class Pattern(object):
-    _Pattern = type(_ure.compile(''))
+    _Pattern = type(_ure.compile(""))
 
     def __init__(self, p, pstring, flags):
         if not isinstance(p, Pattern._Pattern):
@@ -52,12 +60,15 @@ class Pattern(object):
 
     def sub(self, repl, string, count=0):
         if callable(repl):
-            return self._p.sub(lambda m: repl(Match(m, self, string)), string, count)
+            return self._p.sub(
+                lambda m: repl(Match(m, self, string)), string, count
+            )
         else:
             return self._p.sub(repl, string, count)
 
     def findall(self, string, pos=0, endpos=_default):
         all = []
+
         def cb(m):
             groups = m.groups()
             if groups and len(groups) > 2:
@@ -79,7 +90,7 @@ class Pattern(object):
 
 
 class Match(object):
-    _Match = type(_ure.match('',''))
+    _Match = type(_ure.match("", ""))
 
     def __init__(self, m, re, string):
         if not isinstance(m, Match._Match):

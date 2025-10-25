@@ -6,7 +6,11 @@ import sys as _usys
 import _posix
 
 __all__ = [
-    'CalledProcessError', 'Popen', 'STDOUT', 'SubprocessError', 'check_output'
+    "CalledProcessError",
+    "Popen",
+    "STDOUT",
+    "SubprocessError",
+    "check_output",
 ]
 
 
@@ -25,7 +29,8 @@ class CalledProcessError(SubprocessError):
 
     def __str__(self):
         return "Command '%s' returned non-zero exit status %d" % (
-            self.cmd, self.returncode
+            self.cmd,
+            self.returncode,
         )
 
 
@@ -46,7 +51,7 @@ def _close_fd(fd):
         _posix.close(fd)
         fd = -1
     except OSError as ex:
-        _usys.stderr.write('close(): %s\n' % str(ex))
+        _usys.stderr.write("close(): %s\n" % str(ex))
     return fd
 
 
@@ -126,8 +131,8 @@ def check_output(args, *, stderr=None):
             r = _close_fd(r)
             er = _close_fd(er)
 
-            output = b''.join(output_l)
-            errno_b = b''.join(errno_l)
+            output = b"".join(output_l)
+            errno_b = b"".join(errno_l)
 
             _, status = _posix.waitpid(pid, 0)
             pid = -1
@@ -211,7 +216,7 @@ class Popen(object):
 
                 er = _close_fd(er)
 
-                errno_b = b''.join(errno_l)
+                errno_b = b"".join(errno_l)
                 if errno_b:
                     errno = int(errno_b.decode())
                     raise OSError(errno)
