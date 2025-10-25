@@ -2,7 +2,7 @@
 
 '''
 NatterCheck - https://github.com/MikeWang000000/Natter
-Copyright (C) 2025  MikeWang000000
+Copyright (C) 2022 - present  MikeWang000000
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
