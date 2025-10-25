@@ -2137,6 +2137,8 @@ def natter_main(show_title=True):  # noqa: PLR0912, PLR0915
         )
         if ret1 == -1:
             Logger.warning("!! Target port is closed !!")
+        elif ret2 == -1:
+            Logger.warning("!! Forwarder is not working !!")
         elif ret1 == 1 and ret3 == ret4 == -1:
             Logger.warning("!! Hole punching failed !!")
         elif ret3 == 1 and ret4 == -1:
