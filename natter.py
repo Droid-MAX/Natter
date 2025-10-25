@@ -1759,7 +1759,7 @@ def set_reuse_port(port):
         return
 
 
-def natter_main(show_title=True):
+def natter_main(show_title=True):  # noqa: PLR0912, PLR0915
     argp = argparse.ArgumentParser(
         description="Expose your port behind full-cone NAT to the Internet.",
         add_help=False,
