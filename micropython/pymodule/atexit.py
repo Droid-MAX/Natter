@@ -3,9 +3,7 @@
 
 import sys as _usys
 
-__all__ = [
-    'register', 'unregister'
-]
+__all__ = ["register", "unregister"]
 
 
 class _AtExit(object):

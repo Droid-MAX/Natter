@@ -5,6 +5,7 @@
 #   Regular expression syntax supported is a subset of CPython re module.
 
 import sys as _sys
+
 _path = _sys.path
 _sys.path = ()
 try:
@@ -14,7 +15,14 @@ finally:
     del _path
 
 __all__ = [
-    'Match', 'Pattern', 'compile', 'findall', 'match', 'search', 'split', 'sub'
+    "Match",
+    "Pattern",
+    "compile",
+    "findall",
+    "match",
+    "search",
+    "split",
+    "sub",
 ]
 
 
@@ -22,7 +30,7 @@ _default = object()
 
 
 class Pattern(object):
-    _Pattern = type(_ure.compile(''))
+    _Pattern = type(_ure.compile(""))
 
     def __init__(self, p, pstring, flags):
         if not isinstance(p, Pattern._Pattern):
@@ -38,6 +46,7 @@ class Pattern(object):
             m = self._p.search(string, pos, endpos)
         if m:
             return Match(m, self, string)
+        return None
 
     def match(self, string, pos=0, endpos=_default):
         if endpos is _default:
@@ -46,18 +55,22 @@ class Pattern(object):
             m = self._p.match(string, pos, endpos)
         if m:
             return Match(m, self, string)
+        return None
 
     def split(self, string, maxsplit=0):
         return self._p.split(string, maxsplit)
 
     def sub(self, repl, string, count=0):
         if callable(repl):
-            return self._p.sub(lambda m: repl(Match(m, self, string)), string, count)
+            return self._p.sub(
+                lambda m: repl(Match(m, self, string)), string, count
+            )
         else:
             return self._p.sub(repl, string, count)
 
     def findall(self, string, pos=0, endpos=_default):
         all = []
+
         def cb(m):
             groups = m.groups()
             if groups and len(groups) > 2:
@@ -67,10 +80,8 @@ class Pattern(object):
             return type(m.string)()
 
         if endpos is not _default:
-            if endpos < pos:
-                endpos = pos
-            if pos < 0:
-                pos = 0
+            endpos = max(endpos, pos)
+            pos = max(pos, 0)
             string = string[pos:endpos]
         elif pos > 0:
             string = string[pos:]
@@ -79,7 +90,7 @@ class Pattern(object):
 
 
 class Match(object):
-    _Match = type(_ure.match('',''))
+    _Match = type(_ure.match("", ""))
 
     def __init__(self, m, re, string):
         if not isinstance(m, Match._Match):
