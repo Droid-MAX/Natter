@@ -1328,7 +1328,7 @@ class UPnPClient(object):
             while True:
                 try:
                     buff, addr = sock.recvfrom(4096)
-                    m = re.search(r"LOCATION: *(http://[^\[]\S+)\s+",
+                    m = re.search(r"(?:LOCATION|Location): *(http://[^\[]\S+)\s+",
                                   buff.decode("utf-8"))
                     if not m:
                         continue
